@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1512016558234.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "6D5998AF",
+    "lastKnownWriteTime" : 7935406453079154720,
+    "last_content_update" : 1512016558234,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "8F8E26A4",
+        "caption" : "disease_symptoms_matrix_weighted",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=disease_symptoms_matrix_weighted&cache_key=8F8E26A4",
+        "displayedObservations" : "148",
+        "environment" : "",
+        "object" : "disease_symptoms_matrix_weighted",
+        "preview" : "0",
+        "totalObservations" : "148",
+        "variables" : "403"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

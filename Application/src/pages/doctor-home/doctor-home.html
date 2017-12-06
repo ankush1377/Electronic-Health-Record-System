@@ -1,0 +1,32 @@
+<!--
+  Generated template for the DoctorHomePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Electronic Health Record System</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+	<div>
+		<ion-list>
+	  		<ion-item>	
+	    		<ion-label floating>Email id</ion-label>
+	    		<ion-input type="email" #emailId></ion-input>
+	  		</ion-item>
+
+			<ion-item>
+			  <ion-label floating>Password</ion-label>
+			  <ion-input type="password" #password></ion-input>
+			</ion-item>
+		</ion-list>
+	</div>
+	<button ion-button  (click)="signInDoc()">Sign In</button>
+	<button ion-button  (click)="registerDoc()">Register</button>
+</ion-content>

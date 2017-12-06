@@ -1,0 +1,34 @@
+<<ion-header>
+
+  <ion-navbar>
+    <ion-title>Disease Predictor</ion-title>
+    <ion-buttons start>
+      <button ion-button icon-only color="royal" (click)="logoutUser()">
+        <ion-icon name="log-out"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+	
+	<ion-searchbar
+	  [(ngModel)]="searchItem"
+	  [showCancelButton]="shouldShowCancel"
+	  (ionInput)="getItems($event)"
+	  (ionCancel)="onCancel($event)">
+	</ion-searchbar>
+	
+	<ion-list inset no-lines>
+	 	<ion-item *ngFor="let symptom of symptomsList">
+		  <ion-label >{{symptom}}</ion-label>
+		  <ion-checkbox [checked]="symptomChecked(symptom)" (ionChange)="updateSymptomsMap(symptom, $event)" ></ion-checkbox>
+		</ion-item> 
+	</ion-list>
+
+	<button ion-button full (click)="getPredictedDisease()">Predict Disease</button>
+	<button ion-button full (click)="uncheckSymptoms()">Uncheck Symptoms</button>
+
+</ion-content>

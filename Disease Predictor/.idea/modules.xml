@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/elecHlthRecSys.iml" filepath="$PROJECT_DIR$/.idea/modules/elecHlthRecSys.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/elecHlthRecSys_main.iml" filepath="$PROJECT_DIR$/.idea/modules/elecHlthRecSys_main.iml" group="elecHlthRecSys" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/elecHlthRecSys_test.iml" filepath="$PROJECT_DIR$/.idea/modules/elecHlthRecSys_test.iml" group="elecHlthRecSys" />
+    </modules>
+  </component>
+</project>

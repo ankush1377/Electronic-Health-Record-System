@@ -1,0 +1,57 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Setup Credentials</ion-title>
+     <ion-buttons start>
+      <button ion-button icon-only color="royal" (click)="logoutUser()">
+        <ion-icon name="log-out"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+	
+	<ion-card color="danger">
+	  <ion-card-header>
+	    Unique UID
+	  </ion-card-header>
+	  <ion-card-content>
+	    {{uid}}
+	  </ion-card-content>
+	</ion-card>
+
+	<ion-list>
+
+	  <ion-item>
+	    <ion-label>First name</ion-label>
+	    <ion-input type="text" [(ngModel)]="firstName"></ion-input>
+	  </ion-item>
+
+	  <ion-item>
+	    <ion-label>Last name</ion-label>
+	    <ion-input type="text" [(ngModel)]="lastName"></ion-input>
+	  </ion-item>
+
+	  <ion-item>
+	    <ion-label>Gender</ion-label>
+	    <ion-select [(ngModel)]="gender">
+	      <ion-option value="Male">Male</ion-option>
+	      <ion-option value="Female">Female</ion-option>
+	    </ion-select>
+	  </ion-item>
+
+	  <ion-item>
+		  <ion-label>Date of Birth</ion-label>
+		  <ion-datetime displayFormat="MMMM/DD/YYYY" [(ngModel)]="dateOfBirth">
+		  </ion-datetime>
+	  </ion-item>
+
+	
+	</ion-list>
+
+	<button ion-button full (click)="saveUserCredentials()">Save Credentials</button>
+
+</ion-content>

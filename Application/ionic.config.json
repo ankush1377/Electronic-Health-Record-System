@@ -1,0 +1,14 @@
+{
+  "name": "EHRS",
+  "app_id": "",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  },
+  "proxies": [
+    {
+      "path": "/app",
+      "proxyUrl": "http://localhost:8080/app"
+    }
+  ]
+}

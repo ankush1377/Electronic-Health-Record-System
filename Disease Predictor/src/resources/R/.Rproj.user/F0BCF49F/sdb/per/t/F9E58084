@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1512022367453.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "F9E58084",
+    "lastKnownWriteTime" : 18296075354767439,
+    "last_content_update" : 1512022367453,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "73418EF0",
+        "caption" : "disease_symptoms_matrix",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=disease_symptoms_matrix&cache_key=73418EF0",
+        "displayedObservations" : 148,
+        "environment" : "",
+        "object" : "disease_symptoms_matrix",
+        "preview" : 0,
+        "totalObservations" : 148,
+        "variables" : 403
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
