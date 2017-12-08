@@ -76,6 +76,7 @@ export class DoctorRegisterPage {
 	        this.storage.set('emailId', this.emailId);
 	        this.storage.set('password', this.password);
 	        var user = {
+            uid: data.uid,
   		      emailId: this.emailId,
   		      firstName: this.firstName,
   		      lastName: this.lastName,

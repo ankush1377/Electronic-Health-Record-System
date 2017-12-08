@@ -11,39 +11,70 @@
   </ion-navbar>
 
   <div padding>
-  <ion-segment [(ngModel)]="pet">
-    <ion-segment-button value="kittens">
-      Kittens
-    </ion-segment-button>
-    <ion-segment-button value="puppies">
-      Puppies
-    </ion-segment-button>
-  </ion-segment>
-</div>
+    <ion-segment [(ngModel)]="selectedSegment">
+      <ion-segment-button value="profile">
+        My Profile
+      </ion-segment-button>
+      <ion-segment-button value="reports">
+        Reports
+      </ion-segment-button>
+      <ion-segment-button value="prescriptions">
+        Prescriptions
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 
-<div [ngSwitch]="pet">
-  <ion-list *ngSwitchCase="'puppies'">
-    <ion-item>
-      <ion-thumbnail item-start>
-      </ion-thumbnail>
-      <h2>Ruby</h2>
-    </ion-item>
-    ...
-  </ion-list>
+  <div [ngSwitch]="selectedSegment">
+    
+    <ion-list *ngSwitchCase="'profile'">
 
-  <ion-list *ngSwitchCase="'kittens'">
-    <ion-item>
-      <ion-thumbnail item-start>
-      </ion-thumbnail>
-      <h2>Luna</h2>
-    </ion-item>
-    ...
-  </ion-list>
-</div>
+      <ion-item>
+        <ion-label stacked>Unique UID</ion-label>
+        <ion-label>{{uid}}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>Email id</ion-label>
+        <ion-label>{{emailId}}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>First name</ion-label>
+        <ion-label>{{firstName}}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>Last name</ion-label>
+        <ion-label>{{lastName}}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>Gender</ion-label>
+        <ion-label>{{gender}}</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked>Date of birth</ion-label>
+        <ion-label>{{dateOfBirth}}</ion-label>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-list *ngSwitchCase="'reports'">
+        
+        <ion-item>
+          <ion-label >Patient UID</ion-label>
+          <ion-input type="text" [(ngModel)]="patientUid"></ion-input>
+        </ion-item>
+
+        <button ion-button (click)="fetchPatientRecords()">Fetch Records</button>
+    </ion-list>
+
+    <ion-list *ngSwitchCase="'prescriptions'">
+    </ion-list>
+  
+  </div>
 
 </ion-header>
 
 
-<ion-content padding>
-
-</ion-content>

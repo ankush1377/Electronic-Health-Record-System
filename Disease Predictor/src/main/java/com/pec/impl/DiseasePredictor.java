@@ -60,12 +60,13 @@ public class DiseasePredictor {
 
         try {
             //run script
-            ProcessBuilder pb = new ProcessBuilder("C:\\Program Files\\R\\R-3.2.4revised\\bin\\Rscript.exe","E:\\@nKu$h\\Projects\\Electronic Health Record System\\Disease Predictor\\src\\resources\\R\\script.R");
+            ProcessBuilder pb = new ProcessBuilder("C:\\Program Files\\R\\R-3.2.4revised\\bin\\Rscript.exe","E:\\@nKu$h\\Projects\\Electronic-Health-Record-System\\Disease Predictor\\src\\resources\\R\\script.R");
             Process p = pb.start();
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
             String line;
             while ((line = br.readLine()) != null) {
+                System.out.println(line);
                 setPredictionResult(line);
             }
         } catch (IOException e) {

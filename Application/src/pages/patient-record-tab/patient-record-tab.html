@@ -1,16 +1,20 @@
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Records</ion-title>
-    <ion-buttons start>
-      <button ion-button icon-only color="royal" (click)="logoutUser()">
-        <ion-icon name="log-out"></ion-icon>
-      </button>
-    </ion-buttons>
-  </ion-navbar>
+	<ion-toolbar>
+	    <ion-buttons start>
+	      <button ion-button icon-only (click)="logoutUser()">
+	        <ion-icon name="log-out"></ion-icon>
+	      </button>
+	    </ion-buttons>
+	    <ion-title>Records</ion-title>
+	    <ion-buttons end>
+	      <button ion-button icon-only >
+	        <ion-icon name="notifications"></ion-icon>
+	      </button>
+	    </ion-buttons>
+	</ion-toolbar>
 
 </ion-header>
-
 
 <ion-content padding>
 	

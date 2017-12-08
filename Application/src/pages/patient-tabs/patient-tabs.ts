@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavParams } from 'ionic-angular';
+import firebase from 'firebase';
 
 import { PatientProfileTabPage } from '../patient-profile-tab/patient-profile-tab';
 import { PatientRecordTabPage } from '../patient-record-tab/patient-record-tab';
@@ -15,17 +16,15 @@ import { PatientDiseasePredictorTabPage } from '../patient-disease-predictor-tab
 @Component({
   templateUrl: 'patient-tabs.html'
 })
-
-
 export class PatientTabsPage {
 
-  userInfo: Object;
+  userData: Object;
   tab1Root = PatientRecordTabPage;
   tab2Root = PatientProfileTabPage;
   tab3Root = PatientDiseasePredictorTabPage;
 
   constructor(public navParams: NavParams) {
-  	this.userInfo = this.navParams.data;
+  	this.userData = this.navParams.data;
   }
 
   ionViewDidLoad() {

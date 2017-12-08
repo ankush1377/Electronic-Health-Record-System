@@ -1,6 +1,6 @@
-setwd("E:\\@nKu$h\\Projects\\Electronic Health Record System\\Disease Predictor\\src\\resources\\R")
+setwd("E:\\@nKu$h\\Projects\\Electronic-Health-Record-System\\Disease Predictor\\src\\resources\\R")
 load('annModel.RData')
-test<-read.csv(file='E:\\@nKu$h\\Projects\\Electronic Health Record System\\Disease Predictor\\src\\resources\\R\\test.csv')
+test<-read.csv(file='E:\\@nKu$h\\Projects\\Electronic-Health-Record-System\\Disease Predictor\\src\\resources\\R\\test.csv')
 library(nnet)
 prediction<-predict(annModel, test, type="class")
 sep<-as.character(',')

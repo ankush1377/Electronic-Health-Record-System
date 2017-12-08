@@ -1,5 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { Component } from '@angular/core';
+import { IonicPage, NavController, AlertController, LoadingController } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase';
 
@@ -19,12 +19,15 @@ import { PatientTabsPage } from '../patient-tabs/patient-tabs';
 })
 export class PatientLoginPage {
 
-	@ViewChild('emailId') emailId;
-	@ViewChild('password') password;
+  emailId: string = '';
+  password: string = '';
 
   constructor(public alertCtrl: AlertController, 
     private afAuth: AngularFireAuth, 
     public navCtrl: NavController, public loadingCtrl: LoadingController ) {
+    // this.emailId = 'a@gmail.com';
+    // this.password = 'aaaaaa';
+    // this.signInUser();
   }
 
   signInUser(){
@@ -34,39 +37,43 @@ export class PatientLoginPage {
       });
 
       loading.present();
-      this.userAuthentication();
+      this.userAuthentication(loading);
   }
 
-  userAuthentication(){
-    this.afAuth.auth.signInWithEmailAndPassword(this.emailId.value, this.password.value)
+  userAuthentication(loading){
+    this.afAuth.auth.signInWithEmailAndPassword(this.emailId, this.password)
       .then(data=>{
           var database = firebase.database();
           var reference = database.ref('/credentials/patients/' + data.uid);
-          reference.on("value", (snapshot)=> {
+          reference.once("value", (snapshot)=> {
               if(snapshot.val()){
                 var key = Object.keys(snapshot.val())[0];
                 var user = {
-                  emailId: this.emailId.value,
+                  uid: data.uid,
+                  emailId: this.emailId,
                   firstName: snapshot.val()[key]['firstName'],
                   lastName: snapshot.val()[key]['lastName'],
                   gender: snapshot.val()[key]['gender'],
                   dateOfBirth: snapshot.val()[key]['dateOfBirth']
                 };
-                console.log('Signed in with email '+ this.emailId.value);
+                console.log('Signed in with email '+ this.emailId);
                 this.navCtrl.setRoot(PatientTabsPage, user);
               }
               else{
                   console.log('Login error : No such patient account!');
                   this.showAlert('Error', 'There is no user record corresponding to this identifier. The user may have been deleted.');
+                  loading.dismiss();
               }
            }, function (errorObject) {
              console.log("The read failed: " + errorObject.code);
+             loading.dismiss();
          });
 
       })
       .catch(error=>{
         console.log('Login error : ', error.message);
         this.showAlert('Error', error.message);
+        loading.dismiss();
       })    
   }
 

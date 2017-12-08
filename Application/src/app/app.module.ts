@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { ErrorHandler, NgModule } from '@angular/core';
-import { IonicApp, IonicErrorHandler, IonicModule, IonicPageModule } from 'ionic-angular';
+import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { AngularFireModule } from 'angularfire2';
@@ -24,6 +24,8 @@ import { PatientDiseasePredictorTabPage } from '../pages/patient-disease-predict
 import { DoctorHomePage } from '../pages/doctor-home/doctor-home';
 import { DoctorRegisterPage } from '../pages/doctor-register/doctor-register';
 import { DoctorMenuPage } from '../pages/doctor-menu/doctor-menu';
+import { NotificationListComponent } from '../components/notification-list/notification-list';
+
 import { RestProvider } from '../providers/rest/rest';
 
 // Initialize Firebase
@@ -52,6 +54,7 @@ import { RestProvider } from '../providers/rest/rest';
     DoctorHomePage,
     DoctorRegisterPage,
     DoctorMenuPage,
+    NotificationListComponent,
   ],
   imports: [
     BrowserModule,
@@ -83,6 +86,7 @@ import { RestProvider } from '../providers/rest/rest';
     DoctorHomePage,
     DoctorRegisterPage,
     DoctorMenuPage,
+    NotificationListComponent
   ],
   providers: [
     StatusBar,

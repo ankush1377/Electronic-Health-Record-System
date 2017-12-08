@@ -79,6 +79,7 @@ export class PatientSetupPage {
     console.log('Saving user credentials!');
 
     var user = {
+      uid: this.afAuth.auth.currentUser.uid,
       emailId: this.afAuth.auth.currentUser.email,
       firstName: this.firstName,
       lastName: this.lastName,
@@ -86,7 +87,7 @@ export class PatientSetupPage {
       dateOfBirth: this.dateOfBirth
     };
     
-    this.db.list('/credentials/doctors/' + this.afAuth.auth.currentUser.uid).push({
+    this.db.list('/credentials/patients/' + this.afAuth.auth.currentUser.uid).push({
       emailId : user.emailId,
       firstName : user.firstName,
       lastName : user.lastName,

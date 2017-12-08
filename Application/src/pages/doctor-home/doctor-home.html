@@ -18,12 +18,12 @@
 		<ion-list>
 	  		<ion-item>	
 	    		<ion-label floating>Email id</ion-label>
-	    		<ion-input type="email" #emailId></ion-input>
+	    		<ion-input type="email" [(ngModel)]="emailId"></ion-input>
 	  		</ion-item>
 
 			<ion-item>
 			  <ion-label floating>Password</ion-label>
-			  <ion-input type="password" #password></ion-input>
+			  <ion-input type="password" [(ngModel)]="password"></ion-input>
 			</ion-item>
 		</ion-list>
 	</div>

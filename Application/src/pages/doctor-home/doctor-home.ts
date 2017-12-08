@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase';
@@ -22,12 +22,15 @@ import { DoctorMenuPage } from '../doctor-menu/doctor-menu';
 })
 export class DoctorHomePage {
 
-	@ViewChild('emailId') emailId;
-	@ViewChild('password') password;
+	emailId: string = '';
+	password: string = '';
 
   constructor(public navCtrl: NavController, public navParams: NavParams, 
   	public alertCtrl: AlertController, private afAuth: AngularFireAuth, 
     public loadingCtrl: LoadingController ) {
+    // this.emailId = 'abc@gmail.com';
+    // this.password = 'aaaaaa';
+    // this.signInDoc();
   }
 
   signInDoc(){
@@ -41,21 +44,22 @@ export class DoctorHomePage {
   }
 
   doctorAuthentication(loading){
-    this.afAuth.auth.signInWithEmailAndPassword(this.emailId.value, this.password.value)
+    this.afAuth.auth.signInWithEmailAndPassword(this.emailId, this.password)
       .then(data=>{
           var database = firebase.database();
           var reference = database.ref('/credentials/doctors/' + data.uid);
-          reference.on("value", (snapshot)=> {
+          reference.once("value", (snapshot)=> {
               if(snapshot.val()){
                 var key = Object.keys(snapshot.val())[0];
                 var user = {
-                  emailId: this.emailId.value,
+                  uid: data.uid,
+                  emailId: this.emailId,
                   firstName: snapshot.val()[key]['firstName'],
                   lastName: snapshot.val()[key]['lastName'],
                   gender: snapshot.val()[key]['gender'],
                   dateOfBirth: snapshot.val()[key]['dateOfBirth']
                 };
-                console.log('Signed in with email '+ this.emailId.value);
+                console.log('Signed in with email '+ this.emailId);
                 this.navCtrl.setRoot(DoctorMenuPage, user);
               }
               else{
