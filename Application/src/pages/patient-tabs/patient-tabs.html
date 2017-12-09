@@ -1,5 +1,5 @@
 <ion-tabs selectedIndex="1">
-  <ion-tab [root]="tab1Root" tabTitle="Records" tabIcon="medkit"></ion-tab>
+  <ion-tab [root]="tab1Root" [rootParams]="userData" tabTitle="Records" tabIcon="medkit"></ion-tab>
   <ion-tab [root]="tab2Root" [rootParams]="userData" tabTitle="Profile" tabIcon="person"></ion-tab>
-  <ion-tab [root]="tab3Root" tabTitle="Disease Predictor" tabIcon="medical"></ion-tab>
+  <ion-tab [root]="tab3Root" [rootParams]="userData" tabTitle="Disease Predictor" tabIcon="medical"></ion-tab>
 </ion-tabs>

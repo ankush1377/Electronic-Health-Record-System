@@ -1,8 +1,8 @@
     <ion-list>
-      <ion-list-header>Notifications</ion-list-header>
-      <div class="notification" *ngFor="let notification of notificationsList">
-      	<p>Approve records access request from {{notification.senderInfo.firstName}} {{notification.senderInfo.lastName}} ({{notification.senderUid}})</p>
-      	<button ion-item >Approve</button>
-      	<button ion-item >Disprove</button>
+      <ion-list-header>Notifications</ion-list-header> 
+      <div class="notification" *ngFor="let notification of notificationsList" (click)="notificationAction(notification)" >
+      	<div *ngIf="notification.approval == 'pending'">
+      		<p>Approve records access request from {{notification.senderInfo.firstName}} {{notification.senderInfo.lastName}} ({{notification.senderUid}})</p>
+      	</div>
       </div>
     </ion-list>

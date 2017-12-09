@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, PopoverController } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase';
 
 import {PatientHomePage} from '../patient-home/patient-home';
-
+import {NotificationListComponent} from '../../components/notification-list/notification-list';
 /**
  * Generated class for the PatientRecordTabPage page.
  *
@@ -18,36 +18,70 @@ import {PatientHomePage} from '../patient-home/patient-home';
 })
 export class PatientRecordTabPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private afAuth: AngularFireAuth) {
-    var storageRef = firebase.storage().ref();
-    var dataRef = storageRef.child('/data/' + afAuth.auth.currentUser.uid + '/2017-11-16_Hospital-Name_ECG_Doctor-Name.pdf');
-    // console.log(storageRef);
-    // console.log(dataRef);
+  notificationsData: any = {};
 
- //    dataRef.getDownloadURL().then(function(url) {
-	//   // `url` is the download URL for 'images/stars.jpg'
+  constructor(public navCtrl: NavController, public navParams: NavParams, private afAuth: AngularFireAuth,
+     public popoverCtrl: PopoverController ) {
 
-	//   // This can be downloaded directly:
-	//   var xhr = new XMLHttpRequest();
-	//   xhr.responseType = 'blob';
-	//   xhr.onload = function(event) {
-	//     var blob = xhr.response;
-	//   };
-	//   xhr.open('GET', url);
-	//   xhr.send();
+    this.notificationsData['receiverUid'] = navParams.get('uid');
+    this.notificationsData['notificationsList'] = [];
+    
+    var database = firebase.database();
+    var notificationsRef = database.ref('notifications/' + this.navParams.get('uid'));
+    notificationsRef.on('value', (snapshot)=>{
+      this.pollNotifications(database);      
+    });
+  }
 
-	//   // Or inserted into an <img> element:
-	//   // var img = document.getElementById('myimg');
-	//   // img.src = url;
-	// }).catch(function(error) {
-	//   // Handle any errors
-	// });
-    // var storageRef = firebase.storage().ref('/');
-    // var path = afAuth.auth.currentUser.uid + '/' + 
-    // new Date().getFullYear() + '-' + (new Date().getMonth()+1) + '-' + new Date().getDate() + 
-    // '_HospitalName' + '/fileName.pdf';
-    // console.log(path);   
-    // var fileRef = storageRef.child(path);
+  pollNotifications(database){
+    var thisRef = this;
+    thisRef.notificationsData.notificationsList = [];
+    
+    let notificationsPromise = new Promise((resolve, reject) => {
+      var notificationsRef = database.ref('notifications/' + this.navParams.get('uid'));
+      notificationsRef.on('value', (snapshot)=>{
+        resolve(snapshot.val());
+      });
+    });
+
+    notificationsPromise.then( (notifications)=>{
+        var keys = Object.keys(notifications);
+        keys.forEach(function(listItem, index){
+          
+          let doctorDataPromise = new Promise((resolve, reject) => {
+            var doctorReference = database.ref('/credentials/doctors/' + notifications[listItem].sender);
+            doctorReference.once('value', (snapshot)=> {
+              if(snapshot.val()){
+                var key = Object.keys(snapshot.val())[0];
+                var notificationInfo = {
+                  dbKey: listItem,
+                  approval: notifications[listItem].approval,
+                  senderUid: notifications[listItem].sender,
+                  senderInfo: snapshot.val()[key]
+                };
+                resolve(notificationInfo);
+              }
+            });
+          });
+
+          doctorDataPromise.then( (notificationInfo)=>{ 
+            thisRef.notificationsData.notificationsList.push(notificationInfo);
+          }).catch((error)=>{
+            console.log(error);
+          });
+        
+        });
+    }).catch((error)=>{
+      console.log(error);
+    });
+  
+  }
+
+  presentNotifications(event){
+    let popover = this.popoverCtrl.create(NotificationListComponent, this.notificationsData);
+    popover.present({
+      ev: event
+    }); 
   }
 
 

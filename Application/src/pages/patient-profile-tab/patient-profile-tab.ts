@@ -25,7 +25,7 @@ export class PatientProfileTabPage {
   lastName : string = "";
   gender : string = "";
   dateOfBirth : string = "";
-  notificationsList: any = [];
+  notificationsData: any = {};
 
   constructor(private afAuth: AngularFireAuth,  
     public navCtrl: NavController, 
@@ -37,9 +37,10 @@ export class PatientProfileTabPage {
     this.lastName = this.navParams.get('lastName');
     this.gender = this.navParams.get('gender');
     this.dateOfBirth = this.navParams.get('dateOfBirth');
+    this.notificationsData['receiverUid'] = navParams.get('uid');
+    this.notificationsData['notificationsList'] = [];
 
     var database = firebase.database();
-  
     var notificationsRef = database.ref('notifications/' + this.uid);
     notificationsRef.on('value', (snapshot)=>{
       this.pollNotifications(database);      
@@ -49,7 +50,7 @@ export class PatientProfileTabPage {
 
   pollNotifications(database){
     var thisRef = this;
-    thisRef.notificationsList = [];
+    thisRef.notificationsData.notificationsList = [];
     
     let notificationsPromise = new Promise((resolve, reject) => {
       var notificationsRef = database.ref('notifications/' + this.uid);
@@ -65,18 +66,21 @@ export class PatientProfileTabPage {
           let doctorDataPromise = new Promise((resolve, reject) => {
             var doctorReference = database.ref('/credentials/doctors/' + notifications[listItem].sender);
             doctorReference.once('value', (snapshot)=> {
-              var key = Object.keys(snapshot.val())[0];
-              var notificationInfo = {
-                approval: notifications[listItem].approval,
-                senderUid: notifications[listItem].sender,
-                senderInfo: snapshot.val()[key]
-              };
-              resolve(notificationInfo);
+              if(snapshot.val()){
+                var key = Object.keys(snapshot.val())[0];
+                var notificationInfo = {
+                  dbKey: listItem,
+                  approval: notifications[listItem].approval,
+                  senderUid: notifications[listItem].sender,
+                  senderInfo: snapshot.val()[key]
+                };
+                resolve(notificationInfo);
+              }
             });
           });
 
           doctorDataPromise.then( (notificationInfo)=>{ 
-            thisRef.notificationsList.push(notificationInfo);
+            thisRef.notificationsData.notificationsList.push(notificationInfo);
           }).catch((error)=>{
             console.log(error);
           });
@@ -89,7 +93,7 @@ export class PatientProfileTabPage {
   }
 
   presentNotifications(event){
-    let popover = this.popoverCtrl.create(NotificationListComponent, this.notificationsList);
+    let popover = this.popoverCtrl.create(NotificationListComponent, this.notificationsData);
     popover.present({
       ev: event
     }); 

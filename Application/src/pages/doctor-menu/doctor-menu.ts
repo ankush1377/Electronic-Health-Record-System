@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import firebase from 'firebase';
 /**
@@ -25,9 +25,10 @@ export class DoctorMenuPage {
   gender : string = "";
   dateOfBirth : string = "";
   patientUid: string = "";
+  database: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
-    public alertCtrl: AlertController, private db: AngularFireDatabase ) {
+    public alertCtrl: AlertController, private db: AngularFireDatabase, public loadingCtrl: LoadingController ) {
   	this.doctorName = this.navParams.get('firstName') + ' ' + this.navParams.get('lastName');
     this.uid = this.navParams.get('uid');
     this.emailId = this.navParams.get('emailId');
@@ -35,6 +36,7 @@ export class DoctorMenuPage {
     this.lastName = this.navParams.get('lastName');
     this.gender = this.navParams.get('gender');
     this.dateOfBirth = this.navParams.get('dateOfBirth');
+    this.database = firebase.database();
   }
 
   fetchPatientRecords(){
@@ -47,15 +49,18 @@ export class DoctorMenuPage {
   }
 
   sendNotification(uid){
-    var database = firebase.database();
-    var reference = database.ref('/credentials/patients/' + uid);
+    var reference = this.database.ref('/credentials/patients/' + uid);
     reference.on("value", (snapshot)=> {
       if(snapshot.val()){
         this.db.list('/notifications/' + uid).push({
           sender: this.uid,
           approval: 'pending'
         }).then( ()=>{
-          //success
+          // let loading = this.loadingCtrl.create({
+          //   content: 'Waiting for approval...',
+          //   duration: 20000
+          // });
+          // loading.present();
         });
       }
       else{
