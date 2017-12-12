@@ -15,16 +15,23 @@ import firebase from 'firebase';
 export class NotificationListComponent {
 
   notificationsList: any = [];
-  pendingNotificationsList: any = [];
   database: any;
 
   constructor( public navParams: NavParams, public alertCtrl: AlertController, private db: AngularFireDatabase ) {
     console.log('Hello NotificationListComponent Component');
-    this.notificationsList = navParams.data.notificationsList;
+    var notificationsList = [];
+    var thisRef = this;
+    notificationsList = navParams.data.notificationsList;
+    notificationsList.forEach(function(notification,index){
+      if(notification.approval.toUpperCase() === 'pending'.toUpperCase()){
+        thisRef.notificationsList.push(notification);
+      }
+    })
     this.database = firebase.database();
   }
 
   notificationAction(notification){
+    var update = {};
     let confirm = this.alertCtrl.create({
       title: 'Approve Notification',
       message: 'Are you sure you want to allow this user to access your records?',
@@ -33,7 +40,6 @@ export class NotificationListComponent {
           text: 'Don\'t Allow',
           handler: () => {
             console.log('Don\'t Allow clicked');
-            var update = {};
             update['/notifications/' + this.navParams.data.receiverUid + '/' + notification.dbKey + '/approval'] = 'refuse';
             this.database.ref().update(update);
             this.notificationsList.splice(this.notificationsList.indexOf(notification), 1);
@@ -43,7 +49,6 @@ export class NotificationListComponent {
           text: 'Allow',
           handler: () => {
             console.log('Allow clicked');
-            var update = {};
             update['/notifications/' + this.navParams.data.receiverUid + '/' + notification.dbKey + '/approval'] = 'approved';
             this.database.ref().update(update);
             this.notificationsList.splice(this.notificationsList.indexOf(notification), 1);

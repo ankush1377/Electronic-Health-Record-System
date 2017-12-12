@@ -93,7 +93,7 @@ import { RestProvider } from '../providers/rest/rest';
     SplashScreen,
     AngularFireDatabase,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    RestProvider
+    RestProvider,
   ]
 })
 

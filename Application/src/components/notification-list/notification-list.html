@@ -1,8 +1,11 @@
     <ion-list>
       <ion-list-header>Notifications</ion-list-header> 
-      <div class="notification" *ngFor="let notification of notificationsList" (click)="notificationAction(notification)" >
-      	<div *ngIf="notification.approval == 'pending'">
+      <div  class="notificationsList" *ngFor="let notification of notificationsList">
+      	<div padding (click)="notificationAction(notification)">
       		<p>Approve records access request from {{notification.senderInfo.firstName}} {{notification.senderInfo.lastName}} ({{notification.senderUid}})</p>
       	</div>
+      </div>
+      <div padding *ngIf="notificationsList.length==0">
+      	<p>No notifications to display!</p>
       </div>
     </ion-list>

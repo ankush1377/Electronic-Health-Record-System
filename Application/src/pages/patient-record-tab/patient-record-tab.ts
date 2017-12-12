@@ -18,19 +18,53 @@ import {NotificationListComponent} from '../../components/notification-list/noti
 })
 export class PatientRecordTabPage {
 
+  recordsData: any = [];
   notificationsData: any = {};
+  storageRef: any;
+  database: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private afAuth: AngularFireAuth,
      public popoverCtrl: PopoverController ) {
 
+    this.storageRef = firebase.storage().ref('/data/'+navParams.get('uid'));
     this.notificationsData['receiverUid'] = navParams.get('uid');
     this.notificationsData['notificationsList'] = [];
     
-    var database = firebase.database();
-    var notificationsRef = database.ref('notifications/' + this.navParams.get('uid'));
+    this.database = firebase.database();
+    var notificationsRef = this.database.ref('notifications/' + this.navParams.get('uid'));
     notificationsRef.on('value', (snapshot)=>{
-      this.pollNotifications(database);      
+      this.pollNotifications(this.database);      
     });
+    this.fetchRecords();
+  }
+
+  fetchRecords(){ 
+    var thisRef = this; 
+    let recordsPromise = new Promise((resolve, reject) => {
+      var notificationsRef = thisRef.database.ref('records/' + this.navParams.get('uid'));
+      notificationsRef.on('value', (snapshot)=>{
+        resolve(snapshot.val());
+      });
+    });
+
+    recordsPromise.then( (records)=>{
+      if(records){
+        var keys = Object.keys(records);
+        keys.forEach(function(key, index){
+          thisRef.storageRef.child(records[key]).getDownloadURL().then(function(url) {
+            thisRef.recordsData.push({
+              name: records[key],
+              url: url
+            });
+          })
+        })
+      }
+    });
+
+  }
+
+  fetchReport(reportUrl){
+    console.log(reportUrl);
   }
 
   pollNotifications(database){
