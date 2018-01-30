@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Welcome {{doctorName}}</ion-title>
+    <ion-title>Welcome {{doctorInfo.firstName}} {{doctorInfo.lastName}}</ion-title>
   </ion-navbar>
 
   <div padding>
@@ -33,32 +33,32 @@
 
         <ion-item>
           <ion-label stacked>Unique UID</ion-label>
-          <ion-label>{{uid}}</ion-label>
+          <ion-label>{{doctorInfo.uid}}</ion-label>
         </ion-item>
 
         <ion-item>
           <ion-label stacked>Email id</ion-label>
-          <ion-label>{{emailId}}</ion-label>
+          <ion-label>{{doctorInfo.emailId}}</ion-label>
         </ion-item>
 
         <ion-item>
           <ion-label stacked>First name</ion-label>
-          <ion-label>{{firstName}}</ion-label>
+          <ion-label>{{doctorInfo.firstName}}</ion-label>
         </ion-item>
 
         <ion-item>
           <ion-label stacked>Last name</ion-label>
-          <ion-label>{{lastName}}</ion-label>
+          <ion-label>{{doctorInfo.lastName}}</ion-label>
         </ion-item>
 
         <ion-item>
           <ion-label stacked>Gender</ion-label>
-          <ion-label>{{gender}}</ion-label>
+          <ion-label>{{doctorInfo.gender}}</ion-label>
         </ion-item>
 
         <ion-item>
           <ion-label stacked>Date of birth</ion-label>
-          <ion-label>{{dateOfBirth}}</ion-label>
+          <ion-label>{{doctorInfo.dateOfBirth}}</ion-label>
         </ion-item>
 
       </ion-list>      
@@ -67,6 +67,7 @@
 
 
     <div padding *ngSwitchCase="'reports'">
+      
       <ion-list >
         
           <ion-item>
@@ -76,9 +77,13 @@
 
           <button ion-button (click)="sendNotification()">Fetch Records</button>
           <input id="file-field" name="file-field" (change)="uploadFile($event, patientUid)" type="file" accept=".pdf">
-<!--           <button ion-button (click)="uploadFile()">Upload</button> -->
+
       </ion-list>
+      
       <ion-list>
+        <ion-item *ngIf="recordsData.length==0">
+          No records to display!
+        </ion-item>
         <ion-item *ngFor="let record of recordsData">
           <ion-label (click)="fetchReport(record.url)">{{record.name}}</ion-label>
         </ion-item>

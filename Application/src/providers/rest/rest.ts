@@ -17,6 +17,7 @@ export class RestProvider {
     	console.log('Hello RestProvider Provider');
   	}
 
+
   	getPredictedDisease() {
 	  	return new Promise(resolve => {
 	    	this.http.get(this.apiUrl+'/getPredictedDisease').subscribe(

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController } from 'ionic-angular';
 import { PatientLoginPage } from '../patient-login/patient-login';
 import { PatientRegisterPage } from '../patient-register/patient-register';
 
@@ -17,7 +17,7 @@ import { PatientRegisterPage } from '../patient-register/patient-register';
 })
 export class PatientHomePage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor( public navCtrl: NavController ) {
   }
 
   signIn(){

@@ -5,6 +5,9 @@ import firebase from 'firebase';
 
 import { PatientTabsPage } from '../patient-tabs/patient-tabs';
 
+import { UtilityProvider } from '../../providers/utility/utility';
+
+import * as constants from '../../constants';
 /**
  * Generated class for the PatientLoginPage page.
  *
@@ -21,14 +24,18 @@ export class PatientLoginPage {
 
   emailId: string = '';
   password: string = '';
+  database: any;
 
-  constructor(public alertCtrl: AlertController, 
+  constructor(public alertCtrl: AlertController, public utilityProvider: UtilityProvider, 
     private afAuth: AngularFireAuth, 
     public navCtrl: NavController, public loadingCtrl: LoadingController ) {
+
+    this.database = firebase.database();
     // this.emailId = 'a@gmail.com';
     // this.password = 'aaaaaa';
     // this.signInUser();
   }
+
 
   signInUser(){
       let loading = this.loadingCtrl.create({
@@ -40,11 +47,11 @@ export class PatientLoginPage {
       this.userAuthentication(loading);
   }
 
+
   userAuthentication(loading){
     this.afAuth.auth.signInWithEmailAndPassword(this.emailId, this.password)
       .then(data=>{
-          var database = firebase.database();
-          var reference = database.ref('/credentials/patients/' + data.uid);
+          var reference = this.database.ref(constants.DB_CREDENTIALS + '/' + constants.DB_CREDENTIALS_PATIENTS + '/' + data.uid);
           reference.once("value", (snapshot)=> {
               if(snapshot.val()){
                 var key = Object.keys(snapshot.val())[0];
@@ -61,7 +68,7 @@ export class PatientLoginPage {
               }
               else{
                   console.log('Login error : No such patient account!');
-                  this.showAlert('Error', 'There is no user record corresponding to this identifier. The user may have been deleted.');
+                  this.utilityProvider.showAlert('Error', 'There is no user record corresponding to this identifier. The user may have been deleted.');
                   loading.dismiss();
               }
            }, function (errorObject) {
@@ -72,19 +79,11 @@ export class PatientLoginPage {
       })
       .catch(error=>{
         console.log('Login error : ', error.message);
-        this.showAlert('Error', error.message);
+        this.utilityProvider.showAlert('Error', error.message);
         loading.dismiss();
       })    
   }
 
-  showAlert(title: string, subtitle: string) {
-    let alert = this.alertCtrl.create({
-      title: title,
-      subTitle: subtitle,
-      buttons: ['OK']
-    });
-    alert.present();
-  }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad PatientLoginPage');

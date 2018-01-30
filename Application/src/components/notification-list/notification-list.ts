@@ -19,15 +19,19 @@ export class NotificationListComponent {
 
   constructor( public navParams: NavParams, public alertCtrl: AlertController, private db: AngularFireDatabase ) {
     console.log('Hello NotificationListComponent Component');
+    
+    this.database = firebase.database();
     var notificationsList = [];
     var thisRef = this;
     notificationsList = navParams.data.notificationsList;
+    
     notificationsList.forEach(function(notification,index){
       if(notification.approval.toUpperCase() === 'pending'.toUpperCase()){
         thisRef.notificationsList.push(notification);
       }
     })
-    this.database = firebase.database();
+    
+    
   }
 
   notificationAction(notification){

@@ -10,6 +10,7 @@ import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { IonicStorageModule } from '@ionic/storage';
 import { HttpClientModule } from '@angular/common/http';
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 
 import { MyApp } from './app.component';
 import { StartupPage } from '../pages/startup/startup';
@@ -27,6 +28,8 @@ import { DoctorMenuPage } from '../pages/doctor-menu/doctor-menu';
 import { NotificationListComponent } from '../components/notification-list/notification-list';
 
 import { RestProvider } from '../providers/rest/rest';
+import { UtilityProvider } from '../providers/utility/utility';
+import { NotificationsProvider } from '../providers/notifications/notifications';
 
 // Initialize Firebase
   var firebaseAuth = {
@@ -94,6 +97,9 @@ import { RestProvider } from '../providers/rest/rest';
     AngularFireDatabase,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     RestProvider,
+    UtilityProvider,
+    NotificationsProvider,
+    InAppBrowser
   ]
 })
 

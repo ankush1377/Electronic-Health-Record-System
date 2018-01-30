@@ -27,9 +27,9 @@
 	</ion-searchbar>
 	
 	<ion-list inset no-lines>
-	 	<ion-item *ngFor="let symptom of symptomsList">
+	 	<ion-item *ngFor="let symptom of symptomsList; let symptomIndex = index">
 		  <ion-label >{{symptom}}</ion-label>
-		  <ion-checkbox [checked]="symptomChecked(symptom)" (ionChange)="updateSymptomsMap(symptom, $event)" ></ion-checkbox>
+		  <ion-checkbox [checked]="symptomChecked(symptomIndex)" (ionChange)="updateSymptomsMap(symptomIndex, $event)" ></ion-checkbox>
 		</ion-item> 
 	</ion-list>
 

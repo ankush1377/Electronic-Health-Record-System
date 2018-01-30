@@ -18,7 +18,7 @@
 
 	  <ion-item>
 	    <ion-label >Enter email id</ion-label>
-	    <ion-input type="email" [(ngModel)]="emailId"></ion-input>
+	    <ion-input type="email" [(ngModel)]="doctorInfo.emailId"></ion-input>
 	  </ion-item>
 
 	  <ion-item>
@@ -33,17 +33,17 @@
 
 	  <ion-item>
 	    <ion-label>First name</ion-label>
-	    <ion-input type="text" [(ngModel)]="firstName"></ion-input>
+	    <ion-input type="text" [(ngModel)]="doctorInfo.firstName"></ion-input>
 	  </ion-item>
 
 	  <ion-item>
 	    <ion-label>Last name</ion-label>
-	    <ion-input type="text" [(ngModel)]="lastName"></ion-input>
+	    <ion-input type="text" [(ngModel)]="doctorInfo.lastName"></ion-input>
 	  </ion-item>
 
 	  <ion-item>
 	    <ion-label>Gender</ion-label>
-	    <ion-select [(ngModel)]="gender">
+	    <ion-select [(ngModel)]="doctorInfo.gender">
 	      <ion-option value="Male">Male</ion-option>
 	      <ion-option value="Female">Female</ion-option>
 	    </ion-select>
@@ -51,7 +51,7 @@
 
 	  <ion-item>
 		  <ion-label>Date of Birth</ion-label>
-		  <ion-datetime displayFormat="MMMM/DD/YYYY" [(ngModel)]="dateOfBirth">
+		  <ion-datetime displayFormat="MMMM/DD/YYYY" [(ngModel)]="doctorInfo.dateOfBirth">
 		  </ion-datetime>
 	  </ion-item>
 

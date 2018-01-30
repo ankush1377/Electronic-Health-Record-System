@@ -5,6 +5,10 @@ import firebase from 'firebase';
 
 import { DoctorRegisterPage } from '../doctor-register/doctor-register';
 import { DoctorMenuPage } from '../doctor-menu/doctor-menu';
+
+import { UtilityProvider } from '../../providers/utility/utility';
+
+import * as constants from '../../constants';
 /**
  * Generated class for the DoctorHomePage page.
  *
@@ -24,15 +28,19 @@ export class DoctorHomePage {
 
 	emailId: string = '';
 	password: string = '';
+  database: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, 
+  constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,
   	public alertCtrl: AlertController, private afAuth: AngularFireAuth, 
     public loadingCtrl: LoadingController ) {
+    
+    this.database = firebase.database();
     // this.emailId = 'abc@gmail.com';
     // this.password = 'aaaaaa';
     // this.signInDoc();
   }
 
+  
   signInDoc(){
     let loading = this.loadingCtrl.create({
       content: 'Signing in...',
@@ -43,11 +51,11 @@ export class DoctorHomePage {
     this.doctorAuthentication(loading);
   }
 
+  
   doctorAuthentication(loading){
     this.afAuth.auth.signInWithEmailAndPassword(this.emailId, this.password)
       .then(data=>{
-          var database = firebase.database();
-          var reference = database.ref('/credentials/doctors/' + data.uid);
+          var reference = this.database.ref(constants.DB_CREDENTIALS + '/' + constants.DB_CREDENTIALS_DOCTORS + '/' + data.uid);
           reference.once("value", (snapshot)=> {
               if(snapshot.val()){
                 var key = Object.keys(snapshot.val())[0];
@@ -64,7 +72,7 @@ export class DoctorHomePage {
               }
               else{
                   console.log('Login error : No such doctor account!');
-                  this.showAlert('Error', 'There is no user record corresponding to this identifier. The user may have been deleted.');
+                  this.utilityProvider.showAlert('Error', 'There is no user record corresponding to this identifier. The user may have been deleted.');
                   loading.dismiss();
               }
            }, function (errorObject) {
@@ -74,23 +82,16 @@ export class DoctorHomePage {
       })
       .catch(error=>{
         console.log('Login error : ', error.message);
-        this.showAlert('Error', error.message);
+        this.utilityProvider.showAlert('Error', error.message);
         loading.dismiss();
       })    
   }
+
 
   registerDoc(){
     this.navCtrl.push(DoctorRegisterPage);
   }
 
-  showAlert(title: string, subtitle: string) {
-    let alert = this.alertCtrl.create({
-      title: title,
-      subTitle: subtitle,
-      buttons: ['OK']
-    });
-    alert.present();
-  }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad DoctorHomePage');

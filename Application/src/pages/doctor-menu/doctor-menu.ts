@@ -1,7 +1,13 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { AngularFireDatabase } from 'angularfire2/database';
 import firebase from 'firebase';
+
+import { UtilityProvider } from '../../providers/utility/utility';
+
+import * as constants from '../../constants';
+
 /**
  * Generated class for the DoctorMenuPage page.
  *
@@ -17,54 +23,47 @@ import firebase from 'firebase';
 export class DoctorMenuPage {
 
 	selectedSegment: string = 'profile';
-	doctorName: string = "";
-  uid : string = "";
-  emailId : string = "";
-  firstName : string = "";
-  lastName : string = "";
-  gender : string = "";
-  dateOfBirth : string = "";
+  doctorInfo: any = {};
   patientUid: string = "";
   recordsData: any = [];
   database: any;
   storageRef: any;
+  recordsAccessApproval: boolean = false;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-    public alertCtrl: AlertController, private db: AngularFireDatabase, public loadingCtrl: LoadingController ) {
-    this.uid = this.navParams.get('uid');
-    this.emailId = this.navParams.get('emailId');
-    this.firstName = this.navParams.get('firstName');
-    this.lastName = this.navParams.get('lastName');
-    this.gender = this.navParams.get('gender');
-    this.dateOfBirth = this.navParams.get('dateOfBirth');
-    this.doctorName = this.firstName + ' ' + this.lastName;
+  constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,
+    public alertCtrl: AlertController, private db: AngularFireDatabase, public loadingCtrl: LoadingController,
+    private iab: InAppBrowser) {
+    this.doctorInfo = navParams.data;
     this.database = firebase.database();
-    this.storageRef = firebase.storage().ref('/data');
+    this.storageRef = firebase.storage().ref('/' + constants.STORAGE_DATA);
   }
+
 
   sendNotification(){
     var thisRef = this;
+    this.recordsAccessApproval = false;
+    
     if(this.patientUid != ""){
-      var reference = this.database.ref('/credentials/patients/' + this.patientUid);
+      var reference = this.database.ref(constants.DB_CREDENTIALS+'/'+constants.DB_CREDENTIALS_PATIENTS+'/'+this.patientUid);
       reference.on("value", (snapshot)=> {
         if(snapshot.val()){
-          this.db.list('/notifications/' + this.patientUid).push({
-            sender: this.uid,
-            approval: 'pending'
+          this.db.list(constants.DB_NOTIFICATIONS+'/'+this.patientUid).push({
+            sender: this.doctorInfo.uid,
+            approval: constants.NOTIFICATION_STATUS_PENDING
           }).then( ()=>{
 
             var dbKey;
             let notificationsRefPromise = new Promise((resolve, reject) => {
-              var notificationsRef = this.database.ref('notifications/' + this.patientUid);
+              var notificationsRef = this.database.ref(constants.DB_NOTIFICATIONS + '/' + this.patientUid);
               notificationsRef.on('value', (snapshot)=>{
                 var notificationUpdate = snapshot.val();
                 if(notificationUpdate){
                   var keys = Object.keys(notificationUpdate);
                   keys.forEach(function(key, index){
-                    if(notificationUpdate[key].sender.toUpperCase() === thisRef.uid.toUpperCase()){
+                    if(notificationUpdate[key].sender === thisRef.doctorInfo.uid){
                       dbKey = key;
-                      if(notificationUpdate[key].approval.toUpperCase() === 'approved'.toUpperCase() || 
-                        notificationUpdate[key].approval.toUpperCase() === 'refuse'.toUpperCase()){
+                      if(notificationUpdate[key].approval.toUpperCase() === constants.NOTIFICATION_STATUS_APPROVED.toUpperCase() || 
+                        notificationUpdate[key].approval.toUpperCase() === constants.NOTIFICATION_STATUS_REJECTED.toUpperCase()){
                         resolve(notificationUpdate[key].approval);
                       }
                     }
@@ -74,37 +73,44 @@ export class DoctorMenuPage {
             });
 
             notificationsRefPromise.then( (approval)=>{
-              if(approval === 'approved'){
-                console.log(approval);
+              console.log(approval);
+              var patientUid = this.patientUid;
+
+              if(approval == constants.NOTIFICATION_STATUS_APPROVED){
                 this.fetchPatientRecords(this.patientUid);
+                this.recordsAccessApproval = true;
               }
-              else{
-                this.showAlert('Record Access', 'Sorry! The user did not approve this record access.');
+              else if(approval == constants.NOTIFICATION_STATUS_REJECTED){
+                this.utilityProvider.showAlert('Record Access', 'Sorry! The user did not approve this record access.');
                 this.patientUid = '';
               }
+
               var update = {};
-              update['/notifications/' + this.patientUid + '/' + dbKey] = null;
+              update[constants.DB_NOTIFICATIONS + '/' + patientUid + '/' + dbKey] = null;
               this.database.ref().update(update);
             });
 
           });
         }
         else{
-          this.showAlert('Error', 'Enter a valid patient UID');
+          this.utilityProvider.showAlert('Error', 'Enter a valid patient UID');
         }
       }, function (errorObject) {
           console.log("The read failed: " + errorObject.code);
       });
     }
     else{
-      this.showAlert('Error','Please enter patient UID');
+      this.utilityProvider.showAlert('Error','Please enter patient UID');
     }
   }
 
+
   fetchPatientRecords(uid){
+    console.log('fetchPatientRecords');
+
     var thisRef = this; 
     let recordsPromise = new Promise((resolve, reject) => {
-      var notificationsRef = thisRef.database.ref('records/' + uid);
+      var notificationsRef = thisRef.database.ref(constants.DB_RECORDS + '/' + uid);
       notificationsRef.on('value', (snapshot)=>{
         resolve(snapshot.val());
       });
@@ -127,17 +133,26 @@ export class DoctorMenuPage {
     });
   }
 
+
   fetchReport(reportUrl){
-    console.log(reportUrl);
+    return this.iab.create(reportUrl);
   }
+
 
   uploadFile(event, patientUid){
     var thisRef = this;
     console.log(patientUid);
     let fileSelected = event.target.files[0];
+    
+    if(patientUid==null || !this.utilityProvider.checkUidValidity(patientUid, constants.DB_CREDENTIALS_PATIENTS)){
+      this.utilityProvider.showAlert('Error', 'Enter a valid patient UID');
+      event.target.files = null;
+      return;
+    }
+
     if(fileSelected){
       console.log(fileSelected);
-      this.db.list('/records/' + patientUid).push(fileSelected.name);
+      this.db.list(constants.DB_RECORDS + '/' + patientUid).push(fileSelected.name);
       var uploadTask = this.storageRef.child(patientUid + '/' + fileSelected.name).put(fileSelected);
       uploadTask.on('state_changed', function(snapshot){
         // Observe state change events such as progress, pause, and resume
@@ -159,19 +174,12 @@ export class DoctorMenuPage {
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         var downloadURL = uploadTask.snapshot.downloadURL;
         console.log(downloadURL);
-        thisRef.fetchPatientRecords(patientUid);
+        if(thisRef.recordsAccessApproval)
+          thisRef.fetchPatientRecords(patientUid);
       });
     }
   }
 
-  showAlert(title: string, subtitle: string) {
-    let alert = this.alertCtrl.create({
-      title: title,
-      subTitle: subtitle,
-      buttons: ['OK']
-    });
-    alert.present();
-  }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad DoctorMenuPage');

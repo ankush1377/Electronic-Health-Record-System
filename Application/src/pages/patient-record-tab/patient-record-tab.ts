@@ -1,10 +1,14 @@
-import { Component } from '@angular/core';
-import { NavController, NavParams, PopoverController } from 'ionic-angular';
+import { Component, ViewChild  } from '@angular/core';
+import { NavController, NavParams, PopoverController, App  } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase';
 
-import {PatientHomePage} from '../patient-home/patient-home';
-import {NotificationListComponent} from '../../components/notification-list/notification-list';
+import { PatientHomePage } from '../patient-home/patient-home';
+
+import { UtilityProvider } from '../../providers/utility/utility';
+import { NotificationsProvider } from '../../providers/notifications/notifications';
+
+import * as constants from '../../constants';
 /**
  * Generated class for the PatientRecordTabPage page.
  *
@@ -14,7 +18,7 @@ import {NotificationListComponent} from '../../components/notification-list/noti
 
 @Component({
   selector: 'page-patient-record-tab',
-  templateUrl: 'patient-record-tab.html',
+  templateUrl: 'patient-record-tab.html'
 })
 export class PatientRecordTabPage {
 
@@ -24,24 +28,28 @@ export class PatientRecordTabPage {
   database: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private afAuth: AngularFireAuth,
-     public popoverCtrl: PopoverController ) {
+     public popoverCtrl: PopoverController, private notificationsProvider: NotificationsProvider,
+     private utilityProvider: UtilityProvider, public appCtrl: App ) {
 
-    this.storageRef = firebase.storage().ref('/data/'+navParams.get('uid'));
+    this.storageRef = firebase.storage().ref(constants.STORAGE_DATA + '/' + navParams.get('uid'));
     this.notificationsData['receiverUid'] = navParams.get('uid');
     this.notificationsData['notificationsList'] = [];
     
     this.database = firebase.database();
-    var notificationsRef = this.database.ref('notifications/' + this.navParams.get('uid'));
+    var notificationsRef = this.database.ref(constants.DB_NOTIFICATIONS + '/' + this.navParams.get('uid'));
     notificationsRef.on('value', (snapshot)=>{
-      this.pollNotifications(this.database);      
+      notificationsProvider.pollNotifications(this.database, this.notificationsData);      
     });
+    
     this.fetchRecords();
   }
 
+
   fetchRecords(){ 
     var thisRef = this; 
+    
     let recordsPromise = new Promise((resolve, reject) => {
-      var notificationsRef = thisRef.database.ref('records/' + this.navParams.get('uid'));
+      var notificationsRef = thisRef.database.ref(constants.DB_RECORDS + '/' + this.navParams.get('uid'));
       notificationsRef.on('value', (snapshot)=>{
         resolve(snapshot.val());
       });
@@ -63,66 +71,19 @@ export class PatientRecordTabPage {
 
   }
 
+
   fetchReport(reportUrl){
     console.log(reportUrl);
   }
 
-  pollNotifications(database){
-    var thisRef = this;
-    thisRef.notificationsData.notificationsList = [];
-    
-    let notificationsPromise = new Promise((resolve, reject) => {
-      var notificationsRef = database.ref('notifications/' + this.navParams.get('uid'));
-      notificationsRef.on('value', (snapshot)=>{
-        resolve(snapshot.val());
-      });
-    });
-
-    notificationsPromise.then( (notifications)=>{
-        var keys = Object.keys(notifications);
-        keys.forEach(function(listItem, index){
-          
-          let doctorDataPromise = new Promise((resolve, reject) => {
-            var doctorReference = database.ref('/credentials/doctors/' + notifications[listItem].sender);
-            doctorReference.once('value', (snapshot)=> {
-              if(snapshot.val()){
-                var key = Object.keys(snapshot.val())[0];
-                var notificationInfo = {
-                  dbKey: listItem,
-                  approval: notifications[listItem].approval,
-                  senderUid: notifications[listItem].sender,
-                  senderInfo: snapshot.val()[key]
-                };
-                resolve(notificationInfo);
-              }
-            });
-          });
-
-          doctorDataPromise.then( (notificationInfo)=>{ 
-            thisRef.notificationsData.notificationsList.push(notificationInfo);
-          }).catch((error)=>{
-            console.log(error);
-          });
-        
-        });
-    }).catch((error)=>{
-      console.log(error);
-    });
-  
-  }
 
   presentNotifications(event){
-    let popover = this.popoverCtrl.create(NotificationListComponent, this.notificationsData);
-    popover.present({
-      ev: event
-    }); 
+    this.notificationsProvider.presentNotifications(event, this.popoverCtrl, this.notificationsData);
   }
 
 
   logoutUser(){
-    console.log('Logging out');
-    this.afAuth.auth.signOut;
-    this.navCtrl.setRoot(PatientHomePage);
+    this.utilityProvider.logoutUser(this.afAuth, this.appCtrl, PatientHomePage);
   }
 
 

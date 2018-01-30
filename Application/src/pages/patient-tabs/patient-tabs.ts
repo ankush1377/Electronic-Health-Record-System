@@ -24,7 +24,7 @@ export class PatientTabsPage {
   tab3Root = PatientDiseasePredictorTabPage;
 
   constructor(public navParams: NavParams) {
-  	this.userData = this.navParams.data;
+  	this.userData = navParams.data;
   }
 
   ionViewDidLoad() {

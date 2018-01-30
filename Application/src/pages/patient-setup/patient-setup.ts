@@ -6,6 +6,9 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import {PatientHomePage} from '../patient-home/patient-home';
 import { PatientTabsPage } from '../patient-tabs/patient-tabs';
 
+import { UtilityProvider } from '../../providers/utility/utility';
+
+import * as constants from '../../constants';
 /**
  * Generated class for the PatientSetupPage page.
  *
@@ -20,88 +23,62 @@ import { PatientTabsPage } from '../patient-tabs/patient-tabs';
 })
 export class PatientSetupPage {
 
-	uid : string;
-  firstName : string;
-  lastName : string;
-  gender : string;
-  dateOfBirth : string;
+  patientInfo: any = {};
+  uid: string = '';
 
-  constructor(public alertCtrl: AlertController, 
+  constructor(public alertCtrl: AlertController, public utilityProvider: UtilityProvider, 
     private db: AngularFireDatabase, 
     private afAuth: AngularFireAuth, 
     public navCtrl: NavController, 
-    public navParams: NavParams) 
-  {
-    this.uid = afAuth.auth.currentUser.uid;
-    this.firstName = "";
-    this.lastName = "";
-    this.gender = "";
-    this.dateOfBirth = "";
-  }
+    public navParams: NavParams) {
 
-  showAlert(title: string, subtitle: string) {
-    let alert = this.alertCtrl.create({
-      title: title,
-      subTitle: subtitle,
-      buttons: ['OK']
-    });
-    alert.present();
-  }
-
-  logoutUser(){
-    console.log('Logging out');
-    this.afAuth.auth.signOut;
-    this.navCtrl.setRoot(PatientHomePage);
+    this.uid = afAuth.auth.currentUser.uid;;
   }
 
   saveUserCredentials(){
     
-    if(this.firstName == ""){
-      this.showAlert('Error', 'Please enter first name');
+    if(!this.validateName(this.patientInfo.firstName)){
+      this.utilityProvider.showAlert('Error', 'Please enter a valid first name');
       return;
     }
     
-    if(this.lastName == ""){
-      this.showAlert('Error', 'Please enter last name');
+    if(!this.validateName(this.patientInfo.lastName)){
+      this.utilityProvider.showAlert('Error', 'Please enter a valid last name');
       return;
     }
     
-    if(this.gender == ""){
-      this.showAlert('Error', 'Please select gender');
+    if(this.patientInfo.gender == ""){
+      this.utilityProvider.showAlert('Error', 'Please select gender');
       return;
     }
 
-    if(this.dateOfBirth == ""){
-      this.showAlert('Error', 'Please select date of birth');
+    if(this.patientInfo.dateOfBirth == ""){
+      this.utilityProvider.showAlert('Error', 'Please select date of birth');
       return;
     }
 
     console.log('Saving user credentials!');
 
-    var user = {
-      uid: this.afAuth.auth.currentUser.uid,
-      emailId: this.afAuth.auth.currentUser.email,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      gender: this.gender,
-      dateOfBirth: this.dateOfBirth
-    };
-    
-    this.db.list('/credentials/patients/' + this.afAuth.auth.currentUser.uid).push({
-      emailId : user.emailId,
-      firstName : user.firstName,
-      lastName : user.lastName,
-      gender : user.gender,
-      dateOfBirth : user.dateOfBirth
-    });
+    this.patientInfo.emailId = this.afAuth.auth.currentUser.email;
+    this.db.list(constants.DB_CREDENTIALS + '/' + constants.DB_CREDENTIALS_PATIENTS + '/' + this.uid).push(this.patientInfo);
+
+    this.patientInfo['uid'] = this.uid;
 
     // this.storage.set('firstName', this.firstName);
     // this.storage.set('lastName', this.lastName);
     // this.storage.set('gender', this.gender);
     // this.storage.set('dateOfBirth', this.dateOfBirth);
 
-    this.navCtrl.setRoot(PatientTabsPage, user);
+    this.navCtrl.setRoot(PatientTabsPage, this.patientInfo);
   }
+
+
+  validateName(name: string){
+    if(name.length>0 && /^[a-zA-Z]+$/.test(name))  
+      return true;
+    return false;
+  }
+
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad PatientSetupPage');
