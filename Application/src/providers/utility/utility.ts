@@ -36,14 +36,28 @@ export class UtilityProvider {
 
   checkUidValidity(uid, profileType){
     if(uid && profileType){
-      var database = firebase.database();
-      var reference = database.ref(constants.DB_CREDENTIALS + '/' + profileType + '/' + uid);
-      reference.on("value", (snapshot)=> {
-        if(snapshot.val())
-          return true;
-      });
+        
+        let uidCheckPromise = new Promise((resolve, reject) => {
+          var database = firebase.database();
+          var notificationsRef = database.ref(constants.DB_CREDENTIALS + '/' + profileType + '/' + uid);
+          notificationsRef.on('value', (snapshot)=>{
+            resolve(snapshot.val());
+          });
+        });
+
+        uidCheckPromise.then( (data)=>{
+          if(data)
+            return true;
+          return false;
+        });
+      // var database = firebase.database();
+      // var reference = database.ref(constants.DB_CREDENTIALS + '/' + profileType + '/' + uid);
+      // reference.on("value", (snapshot)=> {
+      //   console.log(snapshot.val());
+      //   if(snapshot.val())
+      //     return true;
+      // });
     }
-    return false;
   }
 
 

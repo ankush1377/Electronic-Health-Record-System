@@ -6,27 +6,38 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Electronic Health Record System</ion-title>
+  <ion-navbar >
+    <ion-title ><div id="appTitle">Electronic Health Record System</div></ion-title>
+    <ion-buttons end>
+        <button id="headerButton" ion-button outline icon-right>
+        	About
+          <ion-icon ios="ios-help-circle" md="md-help-circle"></ion-icon>
+        </button>
+      </ion-buttons>
   </ion-navbar>
+
+
 
 </ion-header>
 
 
 <ion-content padding>
-	<div>
+	<div class="loginContainer">
 		<ion-list>
+	  		
 	  		<ion-item>	
-	    		<ion-label floating>Email id</ion-label>
-	    		<ion-input type="email" [(ngModel)]="emailId"></ion-input>
+	    		<ion-input type="email" placeholder="Email address" [(ngModel)]="emailId"></ion-input>
 	  		</ion-item>
 
 			<ion-item>
-			  <ion-label floating>Password</ion-label>
-			  <ion-input type="password" [(ngModel)]="password"></ion-input>
+				<ion-input type="password" placeholder="Password" [(ngModel)]="password"></ion-input>
 			</ion-item>
+
 		</ion-list>
+		<button ion-button  (click)="signInDoc()">Log In</button>
+		<div class="orContainer">
+			<span class="orText">or</span>
+		</div>
+		<button ion-button  (click)="registerDoc()">Register</button>
 	</div>
-	<button ion-button  (click)="signInDoc()">Sign In</button>
-	<button ion-button  (click)="registerDoc()">Register</button>
 </ion-content>

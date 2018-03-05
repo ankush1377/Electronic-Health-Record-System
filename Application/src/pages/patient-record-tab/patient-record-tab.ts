@@ -1,6 +1,7 @@
 import { Component, ViewChild  } from '@angular/core';
 import { NavController, NavParams, PopoverController, App  } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 import firebase from 'firebase';
 
 import { PatientHomePage } from '../patient-home/patient-home';
@@ -29,7 +30,7 @@ export class PatientRecordTabPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private afAuth: AngularFireAuth,
      public popoverCtrl: PopoverController, private notificationsProvider: NotificationsProvider,
-     private utilityProvider: UtilityProvider, public appCtrl: App ) {
+     private utilityProvider: UtilityProvider, public appCtrl: App, private iab: InAppBrowser ) {
 
     this.storageRef = firebase.storage().ref(constants.STORAGE_DATA + '/' + navParams.get('uid'));
     this.notificationsData['receiverUid'] = navParams.get('uid');
@@ -41,7 +42,11 @@ export class PatientRecordTabPage {
       notificationsProvider.pollNotifications(this.database, this.notificationsData);      
     });
     
-    this.fetchRecords();
+    var recordsRef = this.database.ref(constants.DB_RECORDS + '/' + this.navParams.get('uid'));
+    recordsRef.on('value', (snapshot)=>{
+      this.fetchRecords();     
+    });
+    
   }
 
 
@@ -56,6 +61,7 @@ export class PatientRecordTabPage {
     });
 
     recordsPromise.then( (records)=>{
+      thisRef.recordsData = [];
       if(records){
         var keys = Object.keys(records);
         keys.forEach(function(key, index){
@@ -73,7 +79,7 @@ export class PatientRecordTabPage {
 
 
   fetchReport(reportUrl){
-    console.log(reportUrl);
+    return this.iab.create(reportUrl);
   }
 
 

@@ -6,44 +6,49 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Create Account</ion-title>
+  <ion-navbar >
+    <ion-title ><div id="appTitle">Electronic Health Record System</div></ion-title>
+    <ion-buttons end>
+        <button id="headerButton" ion-button outline icon-right>
+        	About
+          <ion-icon ios="ios-help-circle" md="md-help-circle"></ion-icon>
+        </button>
+      </ion-buttons>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+	<div class="registerForm">
 	<ion-list>
-
+	  <ion-list-header>
+      	Create new account
+      </ion-list-header>
 	  <ion-item>
-	    <ion-label >Enter email id</ion-label>
-	    <ion-input type="email" [(ngModel)]="doctorInfo.emailId"></ion-input>
+	    <ion-input placeholder="Enter email id" type="email" [(ngModel)]="doctorInfo.emailId" required></ion-input>
 	  </ion-item>
 
 	  <ion-item>
-	    <ion-label >Enter password</ion-label>
-	    <ion-input type="password" [(ngModel)]="password"></ion-input>
+	    <ion-input placeholder="Enter password" type="password" [(ngModel)]="password" required></ion-input>
 	  </ion-item>
 
 	  <ion-item>
-	    <ion-label >Confirm password</ion-label>
-	    <ion-input type="password" [(ngModel)]="cpassword"></ion-input>
+	    <ion-input placeholder="Confirm password" type="password" [(ngModel)]="cpassword" required></ion-input>
+	  </ion-item>
+
+	  <!-- <ion-item-divider color="light">Personal Details</ion-item-divider> -->
+	  <ion-item>
+	    <ion-input placeholder="First name" type="text" [(ngModel)]="doctorInfo.firstName" required></ion-input>
 	  </ion-item>
 
 	  <ion-item>
-	    <ion-label>First name</ion-label>
-	    <ion-input type="text" [(ngModel)]="doctorInfo.firstName"></ion-input>
-	  </ion-item>
-
-	  <ion-item>
-	    <ion-label>Last name</ion-label>
-	    <ion-input type="text" [(ngModel)]="doctorInfo.lastName"></ion-input>
+	    <ion-input placeholder="Last name" type="text" [(ngModel)]="doctorInfo.lastName" required></ion-input>
 	  </ion-item>
 
 	  <ion-item>
 	    <ion-label>Gender</ion-label>
-	    <ion-select [(ngModel)]="doctorInfo.gender">
+	    <ion-select [(ngModel)]="doctorInfo.gender" required>
 	      <ion-option value="Male">Male</ion-option>
 	      <ion-option value="Female">Female</ion-option>
 	    </ion-select>
@@ -51,11 +56,16 @@
 
 	  <ion-item>
 		  <ion-label>Date of Birth</ion-label>
-		  <ion-datetime displayFormat="MMMM/DD/YYYY" [(ngModel)]="doctorInfo.dateOfBirth">
-		  </ion-datetime>
+		  <ion-datetime displayFormat="MMMM/DD/YYYY" [(ngModel)]="doctorInfo.dateOfBirth" required></ion-datetime>
+	  </ion-item>
+
+	  <!-- <ion-item-divider color="light">Organizational Details</ion-item-divider> -->
+	  <ion-item>
+	    <ion-input placeholder="Hospital/Clinic Name" type="text" [(ngModel)]="doctorInfo.hospitalName" required></ion-input>
 	  </ion-item>
 
 	</ion-list>
 
-	<button ion-button full (click)="registerDoctor()">Create Account</button>
+	<button ion-button full (click)="registerDoctor()">Register</button>
+</div>
 </ion-content>
