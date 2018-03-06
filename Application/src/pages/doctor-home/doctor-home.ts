@@ -65,7 +65,8 @@ export class DoctorHomePage {
                   firstName: snapshot.val()[key]['firstName'],
                   lastName: snapshot.val()[key]['lastName'],
                   gender: snapshot.val()[key]['gender'],
-                  dateOfBirth: snapshot.val()[key]['dateOfBirth']
+                  dateOfBirth: snapshot.val()[key]['dateOfBirth'],
+                  hospitalName: snapshot.val()[key]['hospitalName']
                 };
                 console.log('Signed in with email '+ this.emailId);
                 this.navCtrl.setRoot(DoctorMenuPage, user);

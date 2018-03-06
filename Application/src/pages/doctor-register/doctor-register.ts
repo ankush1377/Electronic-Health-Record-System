@@ -70,6 +70,12 @@ export class DoctorRegisterPage {
       return;
     }
 
+
+    if(this.doctorInfo.hospitalName == ""){
+      this.utilityProvider.showAlert('Error', 'Please enter hospital/clinic name');
+      return;
+    }
+
     if(this.password == this.cpassword){
   		this.afAuth.auth.createUserWithEmailAndPassword(this.doctorInfo.emailId, this.password)
   		.then(data=>{

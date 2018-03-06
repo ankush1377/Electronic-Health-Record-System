@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController, MenuController, App  } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController, App  } from 'ionic-angular';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
@@ -25,7 +25,7 @@ import * as constants from '../../constants';
 })
 export class DoctorMenuPage {
 
-	selectedSegment: string = 'patientCentre';
+	selectedSegment: string = 'validation';
   doctorInfo: any = {};
   patientUid: string = "";
   recordsData: any = [];
@@ -35,14 +35,14 @@ export class DoctorMenuPage {
   fileSelected: any = null;
   uploadEvent: any = null;
   patientInfo: any = {};
+  today: number = Date.now();
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,
     public alertCtrl: AlertController, private db: AngularFireDatabase, public loadingCtrl: LoadingController,
-    private iab: InAppBrowser, public menuCtrl: MenuController, private afAuth: AngularFireAuth, public appCtrl: App) {
+    private iab: InAppBrowser, private afAuth: AngularFireAuth, public appCtrl: App) {
     this.doctorInfo = navParams.data;
     this.database = firebase.database();
     this.storageRef = firebase.storage().ref('/' + constants.STORAGE_DATA);
-    this.menuCtrl.open();
   }
 
 
@@ -88,19 +88,20 @@ export class DoctorMenuPage {
               if(approval == constants.NOTIFICATION_STATUS_APPROVED){
                 let confirm = this.alertCtrl.create({
                   title: 'Patient Approval',
-                  message: 'Patient UID ' + patientUid + ' has approved your access request. How do you wish to proceed further?',
+                  message: 'Access request approved. Proceed further?',
                   buttons: [
                     {
-                      text: 'Cancel',
+                      text: 'No',
                       handler: () => {
                         console.log('Cancel clicked');
                         this.patientInfo = {};
                       }
                     },
                     {
-                      text: 'Fetch patient records',
+                      text: 'Yes',
                       handler: () => {
                         console.log('Fetch patient records');
+                        this.selectedSegment = 'patientCentre';
                         this.fetchPatientRecords(this.patientUid);
                         this.recordsAccessApproval = true;
                       }
@@ -148,7 +149,6 @@ export class DoctorMenuPage {
 
     recordsPromise.then( (records)=>{
       thisRef.recordsData = [];
-      console.log(records);
       if(records){
         var keys = Object.keys(records);
         keys.forEach(function(key, index){
@@ -241,6 +241,24 @@ export class DoctorMenuPage {
       patientUID.indexOf('[')>-1 || patientUID.indexOf(']')>-1 )
       return false;
     return true;
+  }
+
+
+  newPatient(){
+    this.recordsAccessApproval = false;
+    this.patientUid = "";
+    this.recordsData = [];
+    this.patientInfo = {};
+    this.selectedSegment = 'validation';
+  }
+
+
+  addRecord(){
+    this.selectedSegment = 'report';
+  }
+
+  addPrescription(){
+   this.selectedSegment = 'prescription'; 
   }
 
 
