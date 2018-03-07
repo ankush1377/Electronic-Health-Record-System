@@ -238,7 +238,7 @@
                       <p>Patient UID</p>
                     </div>
                     <div id="right">
-                      <h2>{{today}}</h2>
+                      <h2>{{today | date}}</h2>
                       <p>Date</p>
                     </div>
                   </ion-item>
@@ -267,10 +267,10 @@
                   </ion-item>
                   <ion-item>
                   <div id="left">
-                    <input id="file-field" name="file-field" (change)="chooseFile($event)" type="file" accept=".pdf">
+                    <input id="file-field" style="margin: 7px;" name="file-field" (change)="chooseFile($event)" type="file" accept=".pdf">
                   </div>
                   <div id="right">
-                    <button ion-button (click)="uploadFile(patientUid)">Upload</button>
+                    <button ion-button id="uploadButton" (click)="uploadFile(patientUid)">Upload</button>
                   </div>
                   </ion-item>
                 </ion-list>

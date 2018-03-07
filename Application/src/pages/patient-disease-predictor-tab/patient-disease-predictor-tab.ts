@@ -132,14 +132,24 @@ export class PatientDiseasePredictorTabPage {
   }
 
 
-  updateSymptomsMap(symptomIndex: number, event){
-    this.symptomsMap[symptomIndex].value = event.value;
+  updateSymptomsMap(symptom: string, event){
+  	for(var i=0;i<this.symptomsMap.length;i++){
+  		if(this.symptomsMap[i].name==symptom){
+  			this.symptomsMap[i].value = event.value;
+  			break;
+  		}
+  	}
+    // this.symptomsMap[symptomIndex].value = event.value;
     // console.log(this.symptomsMap);
   }
 
 
-  symptomChecked(symptomIndex: number){
-    return this.symptomsMap[symptomIndex].value;
+  symptomChecked(symptom: string){
+  	for(var i=0;i<this.symptomsMap.length;i++){
+  		if(this.symptomsMap[i].name==symptom)
+  			return this.symptomsMap[i].value;
+  	}
+    // return this.symptomsMap[symptomIndex].value;
   }
 
 
