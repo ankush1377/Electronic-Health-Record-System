@@ -26,8 +26,8 @@ import * as constants from '../../constants';
 })
 export class DoctorHomePage {
 
-	emailId: string = '';
-	password: string = '';
+	emailId: string = 'd@gmail.com';
+	password: string = 'aaaaaa';
   database: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,

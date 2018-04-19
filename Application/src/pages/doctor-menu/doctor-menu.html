@@ -4,7 +4,7 @@
       <div id="welcometitle">Welcome</div>
     </ion-title>
     <ion-buttons style="padding-right: 14px;   border-right: 1px solid #fff;  margin-right: 13px;" end>     
-      <button  id="headerButton" ion-button outline icon-right (click)="selectedSegment = 'profile'">
+      <button  id="headerButton" ion-button outline icon-right (click)="selectedSegment = 'myProfile'">
         {{doctorInfo.firstName}} {{doctorInfo.lastName}}
       </button>
     </ion-buttons>
@@ -23,53 +23,46 @@
     <ion-list no-lines>
       <ion-item>
         <ion-segment [(ngModel)]="selectedSegment">
-          <ion-segment-button value="validation" [disabled]="recordsAccessApproval">
-            Validation
+          <ion-segment-button value="patientCentre" >
+            Patient Centre
           </ion-segment-button>
         </ion-segment>
       </ion-item>
       <ion-item>
         <ion-segment [(ngModel)]="selectedSegment">
-          <ion-segment-button value="patientCentre" [disabled]="!recordsAccessApproval">
-            Details & Records
+          <ion-segment-button value="recordsSummary" >
+            Records Summary
           </ion-segment-button>
         </ion-segment>
       </ion-item>
       <ion-item>
         <ion-segment [(ngModel)]="selectedSegment">
-          <ion-segment-button value="report" [disabled]="!recordsAccessApproval">
-            New Report
+          <ion-segment-button value="appointments" >
+            Appointments
           </ion-segment-button>
         </ion-segment>
       </ion-item>
       <ion-item>
         <ion-segment [(ngModel)]="selectedSegment">
-          <ion-segment-button value="prescription" [disabled]="!recordsAccessApproval">
-            New Prescription
-          </ion-segment-button>
-        </ion-segment>
-      </ion-item>
-<!--       <ion-item>
-        <ion-segment [(ngModel)]="selectedSegment">
-          <ion-segment-button value="profile">
+          <ion-segment-button value="myProfile" >
             My Profile
           </ion-segment-button>
         </ion-segment>
       </ion-item>
       <ion-item>
         <ion-segment [(ngModel)]="selectedSegment">
-          <ion-segment-button value="about">
+          <ion-segment-button value="about" >
             About
           </ion-segment-button>
         </ion-segment>
-      </ion-item> -->         
+      </ion-item>  
     </ion-list>
   </div>
   
-  <div class="rightContent">
+  <div class="container" class="rightContent">
     <div [ngSwitch]="selectedSegment">
 
-          <div padding *ngSwitchCase="'profile'">
+          <div padding *ngSwitchCase="'myProfile'">
             <div class="doctorDetailsBox" id="boxShadows">
                 <ion-list>
                   <ion-list-header>
@@ -126,161 +119,227 @@
           
 
 
-          <div padding *ngSwitchCase="'validation'">
-            
-            <div class="patientValidationBox">
-              <ion-list >
-              
-                <ion-item>
-                  <ion-label >Patient UID</ion-label>
-                  <ion-input type="text" [(ngModel)]="patientUid" [disabled]="recordsAccessApproval"></ion-input>
-                </ion-item>
+          <div *ngSwitchCase="'patientCentre'">
 
-                <button id="contentButton" style="margin-top: 20px;" ion-button (click)="sendNotification()" [disabled]="recordsAccessApproval">Validate patient</button>
+            <div padding>
+              <ion-segment [(ngModel)]="pcSelection">
+                <ion-segment-button value="validation">
+                  Validation
+                </ion-segment-button>
+                <ion-segment-button value="details" [disabled]="!recordsAccessApproval">
+                  Details
+                </ion-segment-button>
+                <ion-segment-button value="report" [disabled]="!recordsAccessApproval">
+                  New Report
+                </ion-segment-button>
+                <ion-segment-button value="prescription" [disabled]="!recordsAccessApproval">
+                  New Prescription
+                </ion-segment-button>
+              </ion-segment>
+            </div>
+
+            <div [ngSwitch]="pcSelection">
+              
+              <ion-list *ngSwitchCase="'validation'">
+                <div class="patientValidationBox">
+              
+                  <div class="form-group">
+                    <input type="email" class="form-control" [(ngModel)]="patientUid" placeholder="Patient UID" required>
+                  </div>
+
+                  <button id="contentButton"  ion-button (click)="sendNotification()" [disabled]="recordsAccessApproval">Validate patient</button>
+                </div>
+              </ion-list>
+
+              <ion-list *ngSwitchCase="'details'" >
+                <div class="patientRecordsBox" *ngIf="recordsAccessApproval">
+                
+                  <div class="patientDetailsBox" id="boxShadows">
+                    <ion-list>
+                      <ion-list-header>
+                        <div class="headerText">Personal details (UID : {{patientUid}})</div>
+                        <ion-buttons end (click)="newPatient()">
+                            <button id="" ion-button icon-right >
+                              New patient
+                              <ion-icon ios="ios-backspace" md="md-backspace"></ion-icon>
+                            </button>
+                        </ion-buttons>
+                      </ion-list-header>
+                      <ion-item>
+                        <div id="left">
+                          <h2>{{patientInfo.firstName}}</h2>
+                          <p>First Name</p>
+                        </div>
+                        <div id="right">
+                          <h2>{{patientInfo.lastName}}</h2>
+                          <p>Last Name</p>
+                        </div>
+                      </ion-item>
+                      <ion-item>
+                        <div id="left">
+                          <h2>{{patientInfo.gender}}</h2>
+                          <p>Gender</p>
+                        </div>
+                        <div id="right">
+                          <h2>{{patientInfo.dateOfBirth}}</h2>
+                          <p>Date of Birth</p>
+                        </div>
+                      </ion-item>
+                    </ion-list>
+                  </div>
+                  
+                  <div class="patientReportsBox" id="boxShadows">
+                    <ion-list>
+                      <ion-list-header>
+                        <div class="headerText">Medical records</div>
+                        <ion-buttons end>
+                            <button id="" ion-button icon-right (click)="addRecord()">
+                              Add
+                              <ion-icon ios="ios-document" md="md-document"></ion-icon>
+                            </button>
+                        </ion-buttons>                   
+                      </ion-list-header>
+                      <ion-item *ngIf="recordsData.length==0">
+                        No records to display!
+                      </ion-item>
+                      <button ion-item *ngFor="let record of recordsData" (click)="fetchReport(record.url)">
+                        <h2>{{record.name}}</h2>
+                      </button>
+                    </ion-list>
+                  </div>
+                  
+                  <div class="patientPrescriptionsBox" id="boxShadows">
+                    <ion-list>
+                      <ion-list-header>
+                        <div class="headerText">Past prescriptions</div>
+                        <ion-buttons end>
+                            <button id="" ion-button icon-right (click)="addPrescription()">
+                              Prescribe
+                              <ion-icon ios="ios-paper" md="md-paper"></ion-icon>
+                            </button>
+                        </ion-buttons>  
+                      </ion-list-header>
+                      <ion-item *ngIf="true">
+                        No records to display!
+                      </ion-item>
+    <!--                   <button ion-item *ngFor="let prescription of prescriptionData">
+                        <ion-label (click)="fetchReport(record.url)">{{record.name}}</ion-label>
+                      </button> -->
+                    </ion-list>
+                  </div>
+                </div> 
+              </ion-list>
+              
+              <ion-list *ngSwitchCase="'report'">
+                <div class="newReportBox">
+                  <ion-list>
+                    <ion-list-header>
+                      <div class="headerText">Add new report</div>
+                    </ion-list-header>
+                    <ion-item>
+                      <div id="left">
+                        <h2>{{patientUid}}</h2>
+                        <p>Patient UID</p>
+                      </div>
+                      <div id="right">
+                        <h2>{{today | date}}</h2>
+                        <p>Date</p>
+                      </div>
+                    </ion-item>
+                    <ion-item>
+                      <div id="left">
+                        <h2>{{patientInfo.firstName}} {{patientInfo.lastName}}</h2>
+                        <p>Patient name</p>
+                      </div>
+                      <div id="right">
+                        <h2>{{doctorInfo.firstName}} {{doctorInfo.lastName}}</h2>
+                        <p>Doctor name</p>
+                      </div>
+                    </ion-item>
+                    <ion-item>
+                      <div id="left">
+                        <h2>{{patientInfo.dateOfBirth}}</h2>
+                        <p>Patient DOB</p>
+                      </div>
+                      <div id="right">
+                        <h2>{{doctorInfo.hospitalName}}</h2>
+                        <p>Hospital/Clinic Name</p>
+                      </div>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input type="text" placeholder="Details (optional)" [(ngModel)]="reportDetails"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                    <div id="left">
+                      <input id="file-field" style="margin: 7px;" name="file-field" (change)="chooseFile($event)" type="file" accept=".pdf">
+                    </div>
+                    <div id="right">
+                      <button ion-button id="uploadButton" (click)="uploadFile(patientUid)">Upload</button>
+                    </div>
+                    </ion-item>
+                  </ion-list>
+                </div>
+              </ion-list>
+              
+              <ion-list *ngSwitchCase="'prescription'">
+
               </ion-list>
             </div>
 
           </div>
 
+          <div *ngSwitchCase="'recordsSummary'">
 
-          <div padding *ngSwitchCase="'patientCentre'">
-
-            <div class="patientRecordsBox" *ngIf="recordsAccessApproval">
-              
-              <div class="patientDetailsBox" id="boxShadows">
-                <ion-list>
-                  <ion-list-header>
-                    <div class="headerText">Personal details (UID : {{patientUid}})</div>
-                    <ion-buttons end (click)="newPatient()">
-                        <button id="" ion-button icon-right >
-                          New patient
-                          <ion-icon ios="ios-backspace" md="md-backspace"></ion-icon>
-                        </button>
-                    </ion-buttons>
-                  </ion-list-header>
-                  <ion-item>
-                    <div id="left">
-                      <h2>{{patientInfo.firstName}}</h2>
-                      <p>First Name</p>
-                    </div>
-                    <div id="right">
-                      <h2>{{patientInfo.lastName}}</h2>
-                      <p>Last Name</p>
-                    </div>
-                  </ion-item>
-                  <ion-item>
-                    <div id="left">
-                      <h2>{{patientInfo.gender}}</h2>
-                      <p>Gender</p>
-                    </div>
-                    <div id="right">
-                      <h2>{{patientInfo.dateOfBirth}}</h2>
-                      <p>Date of Birth</p>
-                    </div>
-                  </ion-item>
-                </ion-list>
-              </div>
-              
-              <div class="patientReportsBox" id="boxShadows">
-                <ion-list>
-                  <ion-list-header>
-                    <div class="headerText">Medical records</div>
-                    <ion-buttons end>
-                        <button id="" ion-button icon-right (click)="addRecord()">
-                          Add
-                          <ion-icon ios="ios-document" md="md-document"></ion-icon>
-                        </button>
-                    </ion-buttons>                   
-                  </ion-list-header>
-                  <ion-item *ngIf="recordsData.length==0">
-                    No records to display!
-                  </ion-item>
-                  <button ion-item *ngFor="let record of recordsData" (click)="fetchReport(record.url)">
-                    <h2>{{record.name}}</h2>
-                  </button>
-                </ion-list>
-              </div>
-              
-              <div class="patientPrescriptionsBox" id="boxShadows">
-                <ion-list>
-                  <ion-list-header>
-                    <div class="headerText">Past prescriptions</div>
-                    <ion-buttons end>
-                        <button id="" ion-button icon-right (click)="addPrescription()">
-                          Prescribe
-                          <ion-icon ios="ios-paper" md="md-paper"></ion-icon>
-                        </button>
-                    </ion-buttons>  
-                  </ion-list-header>
-                  <ion-item *ngIf="true">
-                    No records to display!
-                  </ion-item>
-<!--                   <button ion-item *ngFor="let prescription of prescriptionData">
-                    <ion-label (click)="fetchReport(record.url)">{{record.name}}</ion-label>
-                  </button> -->
-                </ion-list>
-              </div>
-            </div> 
-
+            <ion-searchbar
+              [(ngModel)]="searchItem"
+              (ionCancel)="onCancel($event)">
+            </ion-searchbar>
+            
+            <table class="table">
+              <thead class="thead-light">
+                <tr>
+                  <th>SNo.</th>
+                  <th>Patient UID</th>
+                  <th>Patient Name</th>
+                  <th>Hospital/Clinic</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let visitRecord of visitsData | orderBy: order: reverse | filter:searchItem; let i=index">
+                  <td>{{i+1}}</td>
+                  <td>{{visitRecord.patientUID}}</td>
+                  <td>{{visitRecord.patientName}}</td>
+                  <td>{{visitRecord.hospitalName}}</td>
+                  <td>{{visitRecord.timestamp | date}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="jumbotron" *ngIf="visitsData.length==0" style="    background: #fff;
+    margin-top: -10px;
+    text-align: center;">
+              <h6>No patient visits yet!</h6>
+            </div>
           </div>
 
 
 
-          <div  padding *ngSwitchCase="'report'">
-            <div class="newReportBox">
-                <ion-list>
-                  <ion-list-header>
-                    <div class="headerText">Add new report</div>
-                  </ion-list-header>
-                  <ion-item>
-                    <div id="left">
-                      <h2>{{patientUid}}</h2>
-                      <p>Patient UID</p>
-                    </div>
-                    <div id="right">
-                      <h2>{{today | date}}</h2>
-                      <p>Date</p>
-                    </div>
-                  </ion-item>
-                  <ion-item>
-                    <div id="left">
-                      <h2>{{patientInfo.firstName}} {{patientInfo.lastName}}</h2>
-                      <p>Patient name</p>
-                    </div>
-                    <div id="right">
-                      <h2>{{doctorInfo.firstName}} {{doctorInfo.lastName}}</h2>
-                      <p>Doctor name</p>
-                    </div>
-                  </ion-item>
-                  <ion-item>
-                    <div id="left">
-                      <h2>{{patientInfo.dateOfBirth}}</h2>
-                      <p>Patient DOB</p>
-                    </div>
-                    <div id="right">
-                      <h2>{{doctorInfo.hospitalName}}</h2>
-                      <p>Hospital/Clinic Name</p>
-                    </div>
-                  </ion-item>
-                  <ion-item>
-                    <ion-input type="text" placeholder="Details (optional)" [(ngModel)]="reportDetails"></ion-input>
-                  </ion-item>
-                  <ion-item>
-                  <div id="left">
-                    <input id="file-field" style="margin: 7px;" name="file-field" (change)="chooseFile($event)" type="file" accept=".pdf">
-                  </div>
-                  <div id="right">
-                    <button ion-button id="uploadButton" (click)="uploadFile(patientUid)">Upload</button>
-                  </div>
-                  </ion-item>
-                </ion-list>
-              </div>
-                
+          <div *ngSwitchCase="'appointments'">
+            
+            <div padding>
+              <ion-segment [(ngModel)]="appointmentsSelection">
+                <ion-segment-button value="pending">
+                  Pending
+                </ion-segment-button>
+                <ion-segment-button value="upcoming" >
+                  Upcoming
+                </ion-segment-button>
+                <ion-segment-button value="completed" >
+                  Completed
+                </ion-segment-button>
+              </ion-segment>
+            </div>
           </div>
-
-          <div  padding *ngSwitchCase="'prescriptions'">
-          </div>
-
         
       </div>
 

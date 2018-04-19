@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, AlertController, LoadingController
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
+import { OrderPipe } from 'ngx-order-pipe';
 import firebase from 'firebase';
 
 import {DoctorHomePage} from '../doctor-home/doctor-home';
@@ -25,10 +26,12 @@ import * as constants from '../../constants';
 })
 export class DoctorMenuPage {
 
-	selectedSegment: string = 'validation';
+	selectedSegment: string = 'patientCentre';
+  pcSelection: string = 'validation';
   doctorInfo: any = {};
   patientUid: string = "";
   recordsData: any = [];
+  visitsData: any = [];
   database: any;
   storageRef: any;
   recordsAccessApproval: boolean = false;
@@ -36,6 +39,8 @@ export class DoctorMenuPage {
   uploadEvent: any = null;
   patientInfo: any = {};
   today: number = Date.now();
+  order: string = 'timestamp';
+  searchItem : string = '';
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,
     public alertCtrl: AlertController, private db: AngularFireDatabase, public loadingCtrl: LoadingController,
@@ -43,6 +48,8 @@ export class DoctorMenuPage {
     this.doctorInfo = navParams.data;
     this.database = firebase.database();
     this.storageRef = firebase.storage().ref('/' + constants.STORAGE_DATA);
+    this.fetchVisitsSummary();
+
   }
 
 
@@ -108,6 +115,8 @@ export class DoctorMenuPage {
                     }
                   ]
                 });
+                this.addDoctorVisit();
+                this.fetchVisitsSummary();
                 confirm.present();
               }
               else if(approval == constants.NOTIFICATION_STATUS_REJECTED){
@@ -133,6 +142,63 @@ export class DoctorMenuPage {
     else{
       this.utilityProvider.showAlert('Error','Please enter a valid patient UID');
     }
+  }
+
+
+  addDoctorVisit(){
+    //console.log(Date.now());
+    this.db.list(constants.DB_VISITS + '/' + this.doctorInfo.uid + '/' + this.patientUid).push({
+      timestamp: Date.now(),
+      hospitalName: this.doctorInfo.hospitalName
+    });
+  }
+
+
+  fetchVisitsSummary(){
+    console.log('fetchRecordsSummary');
+
+    var thisRef = this; 
+    let visitsPromise = new Promise((resolve, reject) => {
+      var visitsRef = thisRef.database.ref(constants.DB_VISITS + '/' + thisRef.doctorInfo.uid);
+      visitsRef.on('value', (snapshot)=>{
+        resolve(snapshot.val());
+      });
+    });
+
+    visitsPromise.then( (visitsData)=>{
+      thisRef.visitsData = [];
+      
+      if(visitsData){
+        var patientUIDList = Object.keys(visitsData);
+        patientUIDList.forEach(function(patientUID){
+          
+          var patientName;
+          var reference = thisRef.database.ref(constants.DB_CREDENTIALS+'/'+constants.DB_CREDENTIALS_PATIENTS+'/'+patientUID);
+          reference.on("value", (snapshot)=> {
+            if(snapshot.val()){
+              var key = Object.keys(snapshot.val());
+              patientName = (snapshot.val())[key[0]].firstName + ' ' + (snapshot.val())[key[0]].lastName;
+
+              var keys = Object.keys(visitsData[patientUID]);
+              keys.forEach(function(key){
+                
+                thisRef.visitsData.push({
+                  patientUID: patientUID,
+                  patientName: patientName,
+                  timestamp: visitsData[patientUID][key].timestamp,
+                  hospitalName: visitsData[patientUID][key].hospitalName
+                });
+
+              });
+            }
+          });
+
+          // console.log(thisRef.orderPipe);
+          // thisRef.visitsData = thisRef.orderPipe.transform(thisRef.visitsData, 'timestamp');
+          // console.log(thisRef.visitsData);
+        });
+      }
+    });
   }
 
 
@@ -231,6 +297,22 @@ export class DoctorMenuPage {
   }
 
 
+  getItems(ev: any) {
+    // Reset items back to all of the items
+    this.fetchVisitsSummary();
+
+    // set val to the value of the searchbar
+    let val = ev.target.value;
+
+    // if the value is an empty string don't filter the items
+    if (val && val.trim() != '') {
+      this.visitsData = this.visitsData.filter((visit) => {
+        return (visit.toLowerCase().indexOf(val.toLowerCase()) > -1);
+      })
+    }
+  }
+
+
   logoutUser(){
     this.utilityProvider.logoutUser(this.afAuth, this.appCtrl, DoctorHomePage);
   }
@@ -249,16 +331,19 @@ export class DoctorMenuPage {
     this.patientUid = "";
     this.recordsData = [];
     this.patientInfo = {};
-    this.selectedSegment = 'validation';
+    this.selectedSegment = 'patientCentre';
+    this.pcSelection = 'validation';
   }
 
 
   addRecord(){
-    this.selectedSegment = 'report';
+    this.selectedSegment = 'patientCentre';
+    this.pcSelection = 'report';
   }
 
   addPrescription(){
-   this.selectedSegment = 'prescription'; 
+   this.selectedSegment = 'patientCentre'; 
+   this.pcSelection = 'prescription';
   }
 
 

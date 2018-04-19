@@ -21,23 +21,21 @@
 </ion-header>
 
 
-<ion-content padding>
-	<div class="loginContainer">
-		<ion-list>
-	  		
-	  		<ion-item>	
-	    		<ion-input type="email" placeholder="Email address" [(ngModel)]="emailId"></ion-input>
-	  		</ion-item>
+<ion-content>
+	<div class="background">
+		<div class="loginContainer">
+			<div class="form-group">
+				<input type="email" class="form-control" [(ngModel)]="emailId" placeholder="Email address" required>
+			</div>
 
-			<ion-item>
-				<ion-input type="password" placeholder="Password" [(ngModel)]="password"></ion-input>
-			</ion-item>
-
-		</ion-list>
-		<button ion-button  (click)="signInDoc()">Log In</button>
-		<div class="orContainer">
-			<span class="orText">or</span>
+			<div class="form-group">
+				<input type="password" class="form-control" [(ngModel)]="password" placeholder="Password" required>
+			</div>
+			<button ion-button  (click)="signInDoc()">Log In</button>
+			<div class="orContainer">
+				<span class="orText">or</span>
+			</div>
+			<button ion-button  (click)="registerDoc()">Register</button>
 		</div>
-		<button ion-button  (click)="registerDoc()">Register</button>
 	</div>
 </ion-content>

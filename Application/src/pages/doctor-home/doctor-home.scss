@@ -21,19 +21,21 @@ page-doctor-home {
 }
 
 .loginContainer{
+    position: relative;
     margin-top: 6%;
     text-align: center;
-    margin-left: 28%;
-    margin-right: 28%;
-    width: 44%;
+    margin-left: 29%;
+    margin-right: 29%;
+    width: 42%;
     float: left;
+    z-index: 2;
     padding: 60px 150px 50px 150px;
-    background: #fff;
+/*    background: #fff;*/
 }
 
 .button {
     width: 100%;
-    height: 45px;
+    height: 43px;
 }
 
 #headerButton{
@@ -45,7 +47,7 @@ page-doctor-home {
 }
 
 .orContainer{
-        display: block;
+    display: block;
     margin-bottom: 10px;
     margin-left: 10.5%;
     margin-right: 10.5%;
@@ -57,16 +59,36 @@ page-doctor-home {
 }
 
 .orText{
-    font-size: 14px;
+    font-size: 19px;
+    opacity: 1;
 }
 
 .orText>span {
     display: inline-block;
     position: relative;
 }
+
+.background{
+    width: 100%;
+    height: 100%;
+    float: left;
+    padding: 0px;
+    color: rgba(255, 255, 255, 0.9);
+    background-image: url('../../assets/imgs/background.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
 }
 
-.content-md {
-    color: rgba(0,0,0,0.87);
-    background-color: #eceff1;
+
+.form-group{
+    margin-bottom: 15px;
 }
+
+
+.form-group input{
+    height: 40px;
+    font-size: 13px;
+}
+
+}
+

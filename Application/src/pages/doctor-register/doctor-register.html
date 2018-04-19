@@ -19,53 +19,117 @@
 </ion-header>
 
 
-<ion-content padding>
-	<div class="registerForm">
-	<ion-list>
-	  <ion-list-header>
-      	Create new account
-      </ion-list-header>
-	  <ion-item>
-	    <ion-input placeholder="Enter email id" type="email" [(ngModel)]="doctorInfo.emailId" required></ion-input>
-	  </ion-item>
+<ion-content>
+	<div class="background">
+		<div class="registerForm">
+		<ion-list>
+		  <ion-list-header>
+	      	Create new account
+	    </ion-list-header>
+	    <div class="left">
+		    <div class="form-group">
+				  <input type="email" class="form-control" [(ngModel)]="doctorInfo.emailId" placeholder="Email address" required>
+			  </div>
 
-	  <ion-item>
-	    <ion-input placeholder="Enter password" type="password" [(ngModel)]="password" required></ion-input>
-	  </ion-item>
+				<div class="form-group">
+				  <input type="password" class="form-control" [(ngModel)]="password" placeholder="Create a password" required>
+				</div>
 
-	  <ion-item>
-	    <ion-input placeholder="Confirm password" type="password" [(ngModel)]="cpassword" required></ion-input>
-	  </ion-item>
+				<div class="form-group">
+				  <input type="password" class="form-control" [(ngModel)]="cPassword" placeholder="Confirm password" required>
+				</div>
 
-	  <!-- <ion-item-divider color="light">Personal Details</ion-item-divider> -->
-	  <ion-item>
-	    <ion-input placeholder="First name" type="text" [(ngModel)]="doctorInfo.firstName" required></ion-input>
-	  </ion-item>
+				<div class="form-group">
+				  <input type="password" class="form-control" [(ngModel)]="doctorInfo.uprn" placeholder="Enter UPRN" required>
+				</div>
 
-	  <ion-item>
-	    <ion-input placeholder="Last name" type="text" [(ngModel)]="doctorInfo.lastName" required></ion-input>
-	  </ion-item>
 
-	  <ion-item>
-	    <ion-label>Gender</ion-label>
-	    <ion-select [(ngModel)]="doctorInfo.gender" required>
-	      <ion-option value="Male">Male</ion-option>
-	      <ion-option value="Female">Female</ion-option>
-	    </ion-select>
-	  </ion-item>
+				<div class="form-group">
+				  <select class="form-control" [(ngModel)]="selectedState" (change)='setHospitalList()'>
+				    <option disabled value="initial">Select state</option>
+				    <option *ngFor="let state of stateList" >{{state.name}}</option>
+				  </select>
+				</div>
 
-	  <ion-item>
-		  <ion-label>Date of Birth</ion-label>
-		  <ion-datetime displayFormat="MMMM/DD/YYYY" [(ngModel)]="doctorInfo.dateOfBirth" required></ion-datetime>
-	  </ion-item>
 
-	  <!-- <ion-item-divider color="light">Organizational Details</ion-item-divider> -->
-	  <ion-item>
-	    <ion-input placeholder="Hospital/Clinic Name" type="text" [(ngModel)]="doctorInfo.hospitalName" required></ion-input>
-	  </ion-item>
+	<!-- 			<div class="dropdown">
+				  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+				    Dropdown button
+				  </button>
+				  <div class="dropdown-menu">
+				    <a class="dropdown-item" href="#">Link 1</a>
+				    <a class="dropdown-item" href="#">Link 2</a>
+				    <a class="dropdown-item" href="#">Link 3</a>
+				  </div>
+				</div> -->
 
-	</ion-list>
+				<div class="form-group">
+				  <select class="form-control" [(ngModel)]="selectedHospital">
+				    <option disabled value="initial">Select hospital/dispensary/clinic</option>
+				    <optgroup label="Hospitals" *ngIf="hospitalList.hospitals.length>0">
+				    	<option *ngFor="let hospital of hospitalList.hospitals">{{hospital.hospital_name}}</option>
+				    <optgroup label="Dispensaries" *ngIf="hospitalList.dispensaries.length>0">
+				    	<option *ngFor="let hospital of hospitalList.dispensaries">{{hospital.hospitalname}}</option>
+				  </select>
+				</div>
 
-	<button ion-button full (click)="registerDoctor()">Register</button>
+				<div class="form-group">
+				  <select class="form-control">
+				    <option disabled>Select department</option>
+				    <option *ngFor="let dep of departmentList">{{dep}}</option>
+				  </select>
+				</div>
+	    </div>
+	    <div class="right">
+	    	
+	    </div>
+
+	<!-- 	  <ion-item>
+		    <ion-input placeholder="Enter email id" type="email" [(ngModel)]="doctorInfo.emailId" required></ion-input>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-input placeholder="Enter password" type="password" [(ngModel)]="password" required></ion-input>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-input placeholder="Confirm password" type="password" [(ngModel)]="cpassword" required></ion-input>
+		  </ion-item>
+
+
+		  <ion-item>
+		    <ion-input placeholder="First name" type="text" [(ngModel)]="doctorInfo.firstName" required></ion-input>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-input placeholder="Last name" type="text" [(ngModel)]="doctorInfo.lastName" required></ion-input>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-label>Gender</ion-label>
+		    <ion-select [(ngModel)]="doctorInfo.gender" required>
+		      <ion-option value="Male">Male</ion-option>
+		      <ion-option value="Female">Female</ion-option>
+		    </ion-select>
+		  </ion-item>
+
+		  <ion-item>
+			  <ion-label>Date of Birth</ion-label>
+			  <ion-datetime displayFormat="MMMM/DD/YYYY" [(ngModel)]="doctorInfo.dateOfBirth" required></ion-datetime>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-input placeholder="Hospital/Clinic Name" type="text" [(ngModel)]="doctorInfo.hospitalName" required></ion-input>
+		  </ion-item> -->
+
+		</ion-list>
+
+		<button ion-button full (click)="registerDoctor()">Register</button>
+	</div>
 </div>
 </ion-content>
+
+<!-- 
+remove confirm pw,name,gender,dob
+add state dropdown,hospital dropdown,dep dropdown
+-->

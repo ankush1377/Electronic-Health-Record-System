@@ -40,4 +40,28 @@ export class RestProvider {
 	  });
 	}
 
+
+	getHospitalData(state: string){
+		return new Promise(resolve => {
+	    	this.http.get('https://api.data.gov.in/resource/98fa254e-c5f8-4910-a19b-4828939b477d?format=json&api-key=579b464db66ec23bdd000001c4fb377fcdef4f187dcc0df4132d9e0a&filters[state]='+state+'&fields=hospital_name&limit=40000&sort[hospital_name]=asc').subscribe(
+	    	data => {
+	    		resolve(data)}
+	    	, err => {
+	      		console.log(err);
+	    	});
+	  	});
+	}
+
+
+	getDispensaryData(state: string){
+		return new Promise(resolve => {
+	    	this.http.get('https://api.data.gov.in/resource/0578a6c3-056e-4182-af7a-4307f1e0c2a7?format=json&api-key=579b464db66ec23bdd000001c4fb377fcdef4f187dcc0df4132d9e0a&filters[state]='+state+'&fields=hospitalname&limit=10000&sort[hospitalname]=asc').subscribe(
+	    	data => {
+	    		resolve(data)}
+	    	, err => {
+	      		console.log(err);
+	    	});
+	  	});
+	}
+
 }

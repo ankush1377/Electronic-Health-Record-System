@@ -11,6 +11,9 @@ import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { IonicStorageModule } from '@ionic/storage';
 import { HttpClientModule } from '@angular/common/http';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { OrderModule } from 'ngx-order-pipe';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
+
 
 import { MyApp } from './app.component';
 import { StartupPage } from '../pages/startup/startup';
@@ -73,6 +76,8 @@ import { NotificationsProvider } from '../providers/notifications/notifications'
     AngularFirestoreModule, 
     IonicStorageModule.forRoot(),
     HttpClientModule,
+    OrderModule,
+    Ng2SearchPipeModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
