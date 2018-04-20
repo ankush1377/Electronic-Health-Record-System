@@ -202,4 +202,39 @@ page-doctor-menu {
     
 }
 
+.filterText{
+    float: left;
+    font-size: inherit;
+    font-weight: 500;
+    width: 18%;
+    padding-top: 10px;
+    padding-left: 19px;
+    font-size: 14px;
+}
+
+.toText{
+    float: left;
+    font-size: inherit;
+    font-weight: 500;
+    width: 8%;
+    padding-top: 10px;
+    padding-left: 19px;
+    font-size: 14px;
+}
+
+#dateSelect{
+    float: left;
+    width: 28%;
+}
+
+.goButton{
+    float: left;
+    width: 15%;
+    margin-left: 3%;
+    font-size: 13px;
+    margin-top: 1px;
+    height: 75%;
+}
+
+
 }

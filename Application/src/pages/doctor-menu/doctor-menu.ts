@@ -28,27 +28,36 @@ export class DoctorMenuPage {
 
 	selectedSegment: string = 'patientCentre';
   pcSelection: string = 'validation';
-  doctorInfo: any = {};
+  appointmentsSelection: string = 'upcoming';
   patientUid: string = "";
-  recordsData: any = [];
-  visitsData: any = [];
-  database: any;
   storageRef: any;
   recordsAccessApproval: boolean = false;
   fileSelected: any = null;
   uploadEvent: any = null;
-  patientInfo: any = {};
+  database: any;
   today: number = Date.now();
   order: string = 'timestamp';
+  reverse: boolean = true;
   searchItem : string = '';
+  recordsFilter: any = {};
+
+  doctorInfo: any = {};
+  patientInfo: any = {};
+  recordsData: any = [];
+  visitsData: any = [];  
+  appointmentsData: any = [];
+  
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,
     public alertCtrl: AlertController, private db: AngularFireDatabase, public loadingCtrl: LoadingController,
     private iab: InAppBrowser, private afAuth: AngularFireAuth, public appCtrl: App) {
+    
     this.doctorInfo = navParams.data;
     this.database = firebase.database();
     this.storageRef = firebase.storage().ref('/' + constants.STORAGE_DATA);
+
     this.fetchVisitsSummary();
+//    this.fetchAppointmentsData();
 
   }
 
@@ -165,11 +174,11 @@ export class DoctorMenuPage {
       });
     });
 
-    visitsPromise.then( (visitsData)=>{
+    visitsPromise.then( (visitsDataList)=>{
       thisRef.visitsData = [];
       
-      if(visitsData){
-        var patientUIDList = Object.keys(visitsData);
+      if(visitsDataList){
+        var patientUIDList = Object.keys(visitsDataList);
         patientUIDList.forEach(function(patientUID){
           
           var patientName;
@@ -179,14 +188,14 @@ export class DoctorMenuPage {
               var key = Object.keys(snapshot.val());
               patientName = (snapshot.val())[key[0]].firstName + ' ' + (snapshot.val())[key[0]].lastName;
 
-              var keys = Object.keys(visitsData[patientUID]);
+              var keys = Object.keys(visitsDataList[patientUID]);
               keys.forEach(function(key){
                 
                 thisRef.visitsData.push({
                   patientUID: patientUID,
                   patientName: patientName,
-                  timestamp: visitsData[patientUID][key].timestamp,
-                  hospitalName: visitsData[patientUID][key].hospitalName
+                  timestamp: visitsDataList[patientUID][key].timestamp,
+                  hospitalName: visitsDataList[patientUID][key].hospitalName
                 });
 
               });
@@ -201,6 +210,52 @@ export class DoctorMenuPage {
     });
   }
 
+
+  // fetchAppointmentsData(){
+  //   console.log('fetchAppointmentsData');
+
+  //   var thisRef = this; 
+  //   let appointmentsPromise = new Promise((resolve, reject) => {
+  //     var appointmentsRef = thisRef.database.ref(constants.DB_APPOINTMENTS + '/' + thisRef.doctorInfo.uid);
+  //     appointmentsRef.on('value', (snapshot)=>{
+  //       resolve(snapshot.val());
+  //     });
+  //   });
+
+  //   appointmentsPromise.then( (appointmentsData)=>{
+      
+  //     if(appointmentsData){
+  //       var patientUIDList = Object.keys(appointmentsData);
+  //       patientUIDList.forEach(function(patientUID){
+          
+  //         var patientName;
+  //         var reference = thisRef.database.ref(constants.DB_CREDENTIALS+'/'+constants.DB_CREDENTIALS_PATIENTS+'/'+patientUID);
+  //         reference.on("value", (snapshot)=> {
+  //           if(snapshot.val()){
+  //             var key = Object.keys(snapshot.val());
+  //             patientName = (snapshot.val())[key[0]].firstName + ' ' + (snapshot.val())[key[0]].lastName;
+
+  //             var keys = Object.keys(visitsData[patientUID]);
+  //             keys.forEach(function(key){
+                
+  //               thisRef.visitsData.push({
+  //                 patientUID: patientUID,
+  //                 patientName: patientName,
+  //                 timestamp: visitsData[patientUID][key].timestamp,
+  //                 hospitalName: visitsData[patientUID][key].hospitalName
+  //               });
+
+  //             });
+  //           }
+  //         });
+
+  //         // console.log(thisRef.orderPipe);
+  //         // thisRef.visitsData = thisRef.orderPipe.transform(thisRef.visitsData, 'timestamp');
+  //         // console.log(thisRef.visitsData);
+  //       });
+  //     }
+  //   });
+  // }
 
   fetchPatientRecords(uid){
     console.log('fetchPatientRecords');

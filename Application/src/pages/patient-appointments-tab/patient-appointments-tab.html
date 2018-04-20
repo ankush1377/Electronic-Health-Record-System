@@ -6,7 +6,7 @@
 	        <ion-icon name="log-out"></ion-icon>
 	      </button>
 	    </ion-buttons>
-	    <ion-title>My Records</ion-title>
+	    <ion-title>My Appointments</ion-title>
 	    <ion-buttons end>
 	      <button ion-button icon-only (click)="presentNotifications($event)">
 	        <ion-icon name="notifications"></ion-icon>
@@ -16,10 +16,11 @@
 
 </ion-header>
 
+
 <ion-content padding>
 	<ion-list>
-		<ion-item *ngFor="let record of recordsData">
-          <ion-label (click)="fetchReport(record.url)">{{record.name}}</ion-label>
+		<ion-item *ngFor="let appointment of appointmentsData">
+        	<ion-label (click)="fetchReport(record.url)">{{record.name}}</ion-label>
         </ion-item>
 	</ion-list>
 </ion-content>

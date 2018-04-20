@@ -5,6 +5,7 @@ import firebase from 'firebase';
 import { PatientProfileTabPage } from '../patient-profile-tab/patient-profile-tab';
 import { PatientRecordTabPage } from '../patient-record-tab/patient-record-tab';
 import { PatientDiseasePredictorTabPage } from '../patient-disease-predictor-tab/patient-disease-predictor-tab';
+import { PatientAppointmentsTabPage } from '../patient-appointments-tab/patient-appointments-tab';
 
 /**
  * Generated class for the PatientTabsPage page.
@@ -22,6 +23,7 @@ export class PatientTabsPage {
   tab1Root = PatientRecordTabPage;
   tab2Root = PatientProfileTabPage;
   tab3Root = PatientDiseasePredictorTabPage;
+  tab4Root = PatientAppointmentsTabPage;
 
   constructor(public navParams: NavParams) {
   	this.userData = navParams.data;

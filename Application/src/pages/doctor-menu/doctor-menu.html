@@ -290,10 +290,31 @@
 
           <div *ngSwitchCase="'recordsSummary'">
 
-            <ion-searchbar
-              [(ngModel)]="searchItem"
-              (ionCancel)="onCancel($event)">
-            </ion-searchbar>
+            <div class="row">
+              <div class="col-5">
+                <ion-searchbar
+                  [(ngModel)]="searchItem"
+                  (ionCancel)="onCancel($event)">
+                </ion-searchbar>
+              </div>
+              <div class="col-1"></div>
+              <div class="col-6" style="margin-top: 8px;">
+                <span class="filterText">Filter from : </span>
+                <span>
+                  <div class="form-group" id="dateSelect">               
+                    <input type="date" class="form-control" [(ngModel)]="recordsFilter.start">
+                  </div>
+                </span>
+                <span class="toText">to : </span>
+                <span>
+                  <div class="form-group" id="dateSelect">               
+                    <input type="date" class="form-control" [(ngModel)]="recordsFilter.end">
+                  </div>
+                </span>
+                <span><button type="button" class="btn goButton" >Go</button></span>
+              </div>
+            </div>
+
             
             <table class="table">
               <thead class="thead-light">
@@ -339,6 +360,21 @@
                 </ion-segment-button>
               </ion-segment>
             </div>
+
+            <div [ngSwitch]="appointmentsSelection">
+              
+              <div *ngSwitchCase="'pending'">
+                
+              </div>
+
+              <div *ngSwitchCase="'upcoming'">
+              </div>
+
+              <div *ngSwitchCase="'completed'">
+              </div>
+
+            </div>
+          
           </div>
         
       </div>
