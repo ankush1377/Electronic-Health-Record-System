@@ -14,5 +14,7 @@
 
 7.Run MainApplication.java.
 
-8.Go to Application directory->open terminal->run command 'ionic serve --lab'
+8.Go to Application directory->open terminal->run command 'ionic serve --lab' (for patient application)
+  Go to Application directory->open terminal->run command 'ionic serve' (for doctor portal)
+  
 
