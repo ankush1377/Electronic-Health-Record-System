@@ -51,7 +51,7 @@
       </ion-item>
       <ion-item>
         <ion-segment [(ngModel)]="selectedSegment">
-          <ion-segment-button value="about" >
+          <ion-segment-button value="about" [disabled]="true">
             About
           </ion-segment-button>
         </ion-segment>
@@ -132,7 +132,7 @@
                 <ion-segment-button value="report" [disabled]="!recordsAccessApproval">
                   New Report
                 </ion-segment-button>
-                <ion-segment-button value="prescription" [disabled]="!recordsAccessApproval">
+                <ion-segment-button value="prescription" [disabled]="true">
                   New Prescription
                 </ion-segment-button>
               </ion-segment>
@@ -203,7 +203,7 @@
                         No records to display!
                       </ion-item>
                       <button ion-item *ngFor="let record of recordsData" (click)="fetchReport(record.url)">
-                        <h2>{{record.name}}</h2>
+                        <h2>{{record.fileName}}</h2>
                       </button>
                     </ion-list>
                   </div>
@@ -213,7 +213,7 @@
                       <ion-list-header>
                         <div class="headerText">Past prescriptions</div>
                         <ion-buttons end>
-                            <button id="" ion-button icon-right (click)="addPrescription()">
+                            <button id="" ion-button icon-right (click)="addPrescription()" [disabled]="true">
                               Prescribe
                               <ion-icon ios="ios-paper" md="md-paper"></ion-icon>
                             </button>
@@ -288,30 +288,37 @@
 
           </div>
 
+
           <div *ngSwitchCase="'recordsSummary'">
 
             <div class="row">
-              <div class="col-5">
+              <div class="col-3">
                 <ion-searchbar
-                  [(ngModel)]="searchItem"
-                  (ionCancel)="onCancel($event)">
+                  [(ngModel)]="searchKey" (ionCancel)="onCancel($event)">
                 </ion-searchbar>
               </div>
-              <div class="col-1"></div>
+              <!-- <div class="col-1"></div> -->
+              <div class="col-3">
+                <div class="form-check checkboxDiv">
+                  <label class="form-check-label checkboxText">
+                    <input type="checkbox" class="form-check-input" [(ngModel)]="uploadsChecked" (change)="filterUploadVisits(uploadsChecked)">Include visits with no uploads
+                  </label>
+                </div>
+              </div>
               <div class="col-6" style="margin-top: 8px;">
                 <span class="filterText">Filter from : </span>
                 <span>
                   <div class="form-group" id="dateSelect">               
-                    <input type="date" class="form-control" [(ngModel)]="recordsFilter.start">
+                    <input id="datefield" type="date" class="form-control" [(ngModel)]="recordsFilter.startDate" min="2018-04-15">
                   </div>
                 </span>
                 <span class="toText">to : </span>
                 <span>
                   <div class="form-group" id="dateSelect">               
-                    <input type="date" class="form-control" [(ngModel)]="recordsFilter.end">
+                    <input id="datefield" type="date" class="form-control" [(ngModel)]="recordsFilter.endDate">
                   </div>
                 </span>
-                <span><button type="button" class="btn goButton" >Go</button></span>
+                <button id="contentButton"  ion-button style="width: 13%; height: 72%;  margin-left: 17px;  margin-top: 1px;" (click)="filterVisitsData()">Go</button>
               </div>
             </div>
 
@@ -319,28 +326,37 @@
             <table class="table">
               <thead class="thead-light">
                 <tr>
-                  <th>SNo.</th>
+                  <th>Visit No.</th>
                   <th>Patient UID</th>
                   <th>Patient Name</th>
                   <th>Hospital/Clinic</th>
                   <th>Date</th>
+                  <th>Uploads</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let visitRecord of visitsData | orderBy: order: reverse | filter:searchItem; let i=index">
-                  <td>{{i+1}}</td>
+                <tr *ngFor="let visitRecord of visitsDataFiltered | orderBy: order: reverse | filter: searchKey ">
+                  <td>{{visitRecord.visitNumber}}</td>
                   <td>{{visitRecord.patientUID}}</td>
                   <td>{{visitRecord.patientName}}</td>
                   <td>{{visitRecord.hospitalName}}</td>
                   <td>{{visitRecord.timestamp | date}}</td>
+                  <td>
+                    <button ion-button icon-only clear id="tableButton" [disabled]="noRecordsUploaded(visitRecord)" (click)="openRecordsList(visitRecord)">
+                      <ion-icon ios="ios-document" md="md-document"></ion-icon>
+                    </button>
+                    <button ion-button icon-only clear id="tableButton" [disabled]="true">
+                      <ion-icon ios="ios-paper" md="md-paper"></ion-icon>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <div class="jumbotron" *ngIf="visitsData.length==0" style="    background: #fff;
-    margin-top: -10px;
-    text-align: center;">
-              <h6>No patient visits yet!</h6>
+            <div class="jumbotron" *ngIf="visitsDataFiltered.length==0" style="background: #fff; margin-top: -10px; 
+            text-align: center;">
+              <h6>No records to display!</h6>
             </div>
+
           </div>
 
 
@@ -381,4 +397,3 @@
 
   </div>
 </ion-content>
-

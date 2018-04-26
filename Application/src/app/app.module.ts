@@ -30,6 +30,7 @@ import { DoctorHomePage } from '../pages/doctor-home/doctor-home';
 import { DoctorRegisterPage } from '../pages/doctor-register/doctor-register';
 import { DoctorMenuPage } from '../pages/doctor-menu/doctor-menu';
 import { NotificationListComponent } from '../components/notification-list/notification-list';
+import { UploadedRecordsModalComponent } from '../components/uploaded-records-modal/uploaded-records-modal';
 
 import { RestProvider } from '../providers/rest/rest';
 import { UtilityProvider } from '../providers/utility/utility';
@@ -63,6 +64,7 @@ import { NotificationsProvider } from '../providers/notifications/notifications'
     DoctorRegisterPage,
     DoctorMenuPage,
     NotificationListComponent,
+    UploadedRecordsModalComponent
   ],
   imports: [
     BrowserModule,
@@ -97,7 +99,8 @@ import { NotificationsProvider } from '../providers/notifications/notifications'
     DoctorHomePage,
     DoctorRegisterPage,
     DoctorMenuPage,
-    NotificationListComponent
+    NotificationListComponent,
+    UploadedRecordsModalComponent
   ],
   providers: [
     StatusBar,

@@ -1,8 +1,11 @@
 import { NgModule } from '@angular/core';
 import { NotificationListComponent } from './notification-list/notification-list';
+import { UploadedRecordsModalComponent } from './uploaded-records-modal/uploaded-records-modal';
 @NgModule({
-	declarations: [NotificationListComponent],
+	declarations: [NotificationListComponent,
+    UploadedRecordsModalComponent],
 	imports: [],
-	exports: [NotificationListComponent]
+	exports: [NotificationListComponent,
+    UploadedRecordsModalComponent]
 })
 export class ComponentsModule {}

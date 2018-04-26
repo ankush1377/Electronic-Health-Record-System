@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController, App  } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController, App, ModalController } from 'ionic-angular';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { OrderPipe } from 'ngx-order-pipe';
 import firebase from 'firebase';
 
 import {DoctorHomePage} from '../doctor-home/doctor-home';
 
 import { UtilityProvider } from '../../providers/utility/utility';
+
+import { UploadedRecordsModalComponent } from '../../components/uploaded-records-modal/uploaded-records-modal';
 
 import * as constants from '../../constants';
 
@@ -38,19 +39,21 @@ export class DoctorMenuPage {
   today: number = Date.now();
   order: string = 'timestamp';
   reverse: boolean = true;
-  searchItem : string = '';
-  recordsFilter: any = {};
+  recordsFilter: any = {startDate:'', endDate:''};
+  uploadsChecked: boolean = true;
 
   doctorInfo: any = {};
   patientInfo: any = {};
   recordsData: any = [];
   visitsData: any = [];  
+  visitsDataFiltered: any = [];  
   appointmentsData: any = [];
+  visitFilesUploaded: any = {records : [], prescriptions : []};
   
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,
     public alertCtrl: AlertController, private db: AngularFireDatabase, public loadingCtrl: LoadingController,
-    private iab: InAppBrowser, private afAuth: AngularFireAuth, public appCtrl: App) {
+    private iab: InAppBrowser, private afAuth: AngularFireAuth, public appCtrl: App, public modalCtrl: ModalController) {
     
     this.doctorInfo = navParams.data;
     this.database = firebase.database();
@@ -124,8 +127,7 @@ export class DoctorMenuPage {
                     }
                   ]
                 });
-                this.addDoctorVisit();
-                this.fetchVisitsSummary();
+                this.visitFilesUploaded = {records : [], prescriptions : []};
                 confirm.present();
               }
               else if(approval == constants.NOTIFICATION_STATUS_REJECTED){
@@ -154,13 +156,18 @@ export class DoctorMenuPage {
   }
 
 
+
   addDoctorVisit(){
-    //console.log(Date.now());
+
     this.db.list(constants.DB_VISITS + '/' + this.doctorInfo.uid + '/' + this.patientUid).push({
+      visitNumber: this.visitsData.length +1,
       timestamp: Date.now(),
-      hospitalName: this.doctorInfo.hospitalName
+      hospitalName: this.doctorInfo.hospitalName,
+      filesUploaded: this.visitFilesUploaded
     });
+
   }
+
 
 
   fetchVisitsSummary(){
@@ -180,7 +187,6 @@ export class DoctorMenuPage {
       if(visitsDataList){
         var patientUIDList = Object.keys(visitsDataList);
         patientUIDList.forEach(function(patientUID){
-          
           var patientName;
           var reference = thisRef.database.ref(constants.DB_CREDENTIALS+'/'+constants.DB_CREDENTIALS_PATIENTS+'/'+patientUID);
           reference.on("value", (snapshot)=> {
@@ -190,26 +196,59 @@ export class DoctorMenuPage {
 
               var keys = Object.keys(visitsDataList[patientUID]);
               keys.forEach(function(key){
+
+                var filesUploaded;
+                if(!visitsDataList[patientUID][key].filesUploaded)
+                  filesUploaded = false;
+                else
+                  filesUploaded = visitsDataList[patientUID][key].filesUploaded;
                 
                 thisRef.visitsData.push({
+                  visitNumber: visitsDataList[patientUID][key].visitNumber,
                   patientUID: patientUID,
                   patientName: patientName,
                   timestamp: visitsDataList[patientUID][key].timestamp,
-                  hospitalName: visitsDataList[patientUID][key].hospitalName
-                });
+                  hospitalName: visitsDataList[patientUID][key].hospitalName,
+                  filesUploaded: filesUploaded
+                });              
 
               });
             }
           });
 
-          // console.log(thisRef.orderPipe);
-          // thisRef.visitsData = thisRef.orderPipe.transform(thisRef.visitsData, 'timestamp');
-          // console.log(thisRef.visitsData);
         });
       }
+      thisRef.visitsDataFiltered = thisRef.visitsData;
+//      console.log(thisRef.visitsDataFiltered);
     });
   }
 
+
+
+  filterVisitsData(){
+
+    if(!this.recordsFilter.startDate || !this.recordsFilter.endDate){
+      this.utilityProvider.showAlert('Error', 'Please select filtering period!');
+      return;
+    }
+
+    if(new Date(this.recordsFilter.startDate) > new Date(this.recordsFilter.endDate)){
+      this.utilityProvider.showAlert('Error', 'Invalid period selected!');
+      return;
+    }
+
+    var startDate = Number(new Date(this.recordsFilter.startDate));
+    var date = new Date(this.recordsFilter.endDate);
+    var endDate = Number(new Date(date.setTime(date.getTime() + 86400000)));
+    this.visitsDataFiltered = [];
+    var thisRef= this;
+
+    this.visitsData.forEach(function(visit){
+      if(visit.timestamp>=startDate && visit.timestamp<=endDate)
+        thisRef.visitsDataFiltered.push(visit);
+    });
+
+  }
 
   // fetchAppointmentsData(){
   //   console.log('fetchAppointmentsData');
@@ -257,6 +296,8 @@ export class DoctorMenuPage {
   //   });
   // }
 
+
+
   fetchPatientRecords(uid){
     console.log('fetchPatientRecords');
 
@@ -270,12 +311,13 @@ export class DoctorMenuPage {
 
     recordsPromise.then( (records)=>{
       thisRef.recordsData = [];
+      console.log(records);
       if(records){
         var keys = Object.keys(records);
-        keys.forEach(function(key, index){
-          thisRef.storageRef.child(uid + '/' + records[key]).getDownloadURL().then(function(url) {
+        keys.forEach(function(key){
+          thisRef.storageRef.child(uid + '/' + records[key].fileName).getDownloadURL().then(function(url) {
             thisRef.recordsData.push({
-              name: records[key],
+              fileName: records[key].fileName,
               url: url
             });
           })
@@ -285,15 +327,18 @@ export class DoctorMenuPage {
   }
 
 
+
   fetchReport(reportUrl){
     return this.iab.create(reportUrl);
   }
+
 
 
   chooseFile(event){
     this.fileSelected = event.target.files[0];
     this.uploadEvent = event;
   }
+
 
 
   uploadFile(patientUid){
@@ -343,8 +388,15 @@ export class DoctorMenuPage {
         // Handle successful uploads on complete
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         var downloadURL = uploadTask.snapshot.downloadURL;
-        console.log(downloadURL);
-        thisRef.db.list(constants.DB_RECORDS + '/' + patientUid).push(thisRef.fileSelected.name);
+    //    console.log(downloadURL);
+        thisRef.visitFilesUploaded.records.push({
+          fileName: thisRef.fileSelected.name,
+          url: downloadURL
+        });
+        thisRef.db.list(constants.DB_RECORDS + '/' + patientUid).push({
+          fileName: thisRef.fileSelected.name,
+          url: downloadURL
+        });
         if(thisRef.recordsAccessApproval)
           thisRef.fetchPatientRecords(patientUid);
       });
@@ -352,25 +404,27 @@ export class DoctorMenuPage {
   }
 
 
-  getItems(ev: any) {
-    // Reset items back to all of the items
-    this.fetchVisitsSummary();
 
-    // set val to the value of the searchbar
-    let val = ev.target.value;
-
-    // if the value is an empty string don't filter the items
-    if (val && val.trim() != '') {
-      this.visitsData = this.visitsData.filter((visit) => {
-        return (visit.toLowerCase().indexOf(val.toLowerCase()) > -1);
-      })
+  filterUploadVisits(uploadsChecked: boolean){
+    if(uploadsChecked===true){
+      this.visitsDataFiltered = this.visitsData;
+    }
+    else{
+      this.visitsDataFiltered = [];
+      var thisRef= this;
+      this.visitsData.forEach(function(visitData){
+        if(visitData.filesUploaded!=false)
+          thisRef.visitsDataFiltered.push(visitData);
+      });
     }
   }
+
 
 
   logoutUser(){
     this.utilityProvider.logoutUser(this.afAuth, this.appCtrl, DoctorHomePage);
   }
+
 
 
   validatePatientUID(patientUID: string){
@@ -381,13 +435,59 @@ export class DoctorMenuPage {
   }
 
 
+
   newPatient(){
-    this.recordsAccessApproval = false;
-    this.patientUid = "";
-    this.recordsData = [];
-    this.patientInfo = {};
-    this.selectedSegment = 'patientCentre';
-    this.pcSelection = 'validation';
+
+    let confirm = this.alertCtrl.create({
+      title: 'New Patient',
+      message: 'Are you sure you want to check a new patient?',
+      buttons: [
+      {
+          text: 'No',
+          handler: () => {
+          console.log('Cancel clicked');
+        }
+      },
+      {
+        text: 'Yes',
+        handler: () => {
+          console.log('New patient');
+
+          this.addDoctorVisit();
+          this.fetchVisitsSummary();
+
+          this.recordsAccessApproval = false;
+          this.patientUid = "";
+          this.recordsData = [];
+          this.patientInfo = {};
+          this.selectedSegment = 'patientCentre';
+          this.pcSelection = 'validation';
+          }
+        }
+      ]
+    });
+    confirm.present();
+
+  }
+
+
+  noRecordsUploaded(visitRecord){
+
+    if(!visitRecord.filesUploaded)
+      return true;
+
+    if(visitRecord.filesUploaded.records.length==0)
+      return true;
+
+    return false;
+  }
+
+
+
+  openRecordsList(visitRecord){
+    console.log(visitRecord);
+    let modal = this.modalCtrl.create(UploadedRecordsModalComponent, visitRecord);
+    modal.present();
   }
 
 
