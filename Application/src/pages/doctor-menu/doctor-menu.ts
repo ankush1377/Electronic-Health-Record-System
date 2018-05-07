@@ -41,7 +41,8 @@ export class DoctorMenuPage {
   visitsReverse: boolean = true;
   recordsFilter: any = {startDate:'', endDate:''};
   uploadsChecked: boolean = true;
-  appointmentsOrder: string = 'appointment.data.timestamp';
+  appointmentsOrder: string = 'data.timestamp';
+  appointmentsReverse: boolean = false;
 
   doctorInfo: any = {};
   patientInfo: any = {};

@@ -392,7 +392,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let appointment of appointmentsData.pending | orderBy: visitsOrder; let i=index">
+                    <tr *ngFor="let appointment of appointmentsData.pending | orderBy: appointmentsOrder: appointmentsReverse; let i=index">
                       <td>{{i+1}}</td>
                       <td>{{appointment.data.patientUID}}</td>
                       <td>{{appointment.patientName}}</td>
@@ -427,7 +427,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let appointment of appointmentsData.upcoming | orderBy: visitsOrder; let i=index">
+                    <tr *ngFor="let appointment of appointmentsData.upcoming | orderBy: appointmentsOrder: appointmentsReverse; let i=index">
                       <td>{{i+1}}</td>
                       <td>{{appointment.data.patientUID}}</td>
                       <td>{{appointment.patientName}}</td>
@@ -455,7 +455,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let appointment of appointmentsData.completed | orderBy: visitsOrder; let i=index">
+                    <tr *ngFor="let appointment of appointmentsData.completed | orderBy: appointmentsOrder: appointmentsReverse; let i=index">
                       <td>{{i+1}}</td>
                       <td>{{appointment.data.patientUID}}</td>
                       <td>{{appointment.patientName}}</td>
