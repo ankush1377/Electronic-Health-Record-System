@@ -26,8 +26,8 @@ import * as constants from '../../constants';
 })
 export class DoctorHomePage {
 
-	emailId: string = 'd@gmail.com';
-	password: string = 'aaaaaa';
+	emailId: string = '';
+	password: string = '';
   database: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private utilityProvider: UtilityProvider,
@@ -35,8 +35,6 @@ export class DoctorHomePage {
     public loadingCtrl: LoadingController ) {
     
     this.database = firebase.database();
-    // this.emailId = 'abc@gmail.com';
-    // this.password = 'aaaaaa';
     // this.signInDoc();
   }
 

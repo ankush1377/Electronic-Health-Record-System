@@ -18,9 +18,102 @@
 
 
 <ion-content padding>
-	<ion-list>
-		<ion-item *ngFor="let appointment of appointmentsData">
-        	<ion-label (click)="fetchReport(record.url)">{{record.name}}</ion-label>
-        </ion-item>
-	</ion-list>
+	<div>
+	  <ion-segment [(ngModel)]="selectedSegment">
+	    <ion-segment-button value="new">
+	      New
+	    </ion-segment-button>
+	    <ion-segment-button value="upcoming">
+	      Upcoming
+	    </ion-segment-button>
+	  </ion-segment>
+	</div>
+
+	<div [ngSwitch]="selectedSegment">
+	  
+	  <div padding>
+	  	<div *ngSwitchCase="'new'">
+			<ion-list >
+				
+				<ion-item>
+				    <!-- <ion-label>State</ion-label> -->
+				    <ion-select placeholder="State" [(ngModel)]="selectedState" interface="action-sheet" (ionChange)="setHospitalList()">
+				      <ion-option *ngFor="let state of stateList">{{state.name}}</ion-option>
+				    </ion-select>
+				</ion-item>
+
+				<ion-item>
+				    <ion-select placeholder="Hospital/dispensary/clinic" [(ngModel)]="selectedHospital" interface="action-sheet" (ionChange)="setDoctorList()">
+				      <ion-option *ngFor="let hospital of hospitalList.hospitals">{{hospital.hospital_name}}</ion-option>
+				      <ion-option *ngFor="let hospital of hospitalList.dispensaries">{{hospital.hospitalname}}</ion-option>
+				    </ion-select>
+				</ion-item>
+
+				<ion-item>
+				    <!-- <ion-label>State</ion-label> -->
+				    <ion-select placeholder="Department" [(ngModel)]="selectedDepartment" interface="action-sheet" [disabled]="true">
+				      <ion-option *ngFor="let dep of departmentList">{{dep}}</ion-option>
+				    </ion-select>
+				</ion-item>
+
+				<ion-item>
+				    <!-- <ion-label>State</ion-label> -->
+				    <ion-select placeholder="Doctor" [(ngModel)]="selectedDoctor" interface="action-sheet" >
+				      <ion-option *ngFor="let doctor of doctorList" [value]="doctor.uid">{{doctor.info.firstName}} {{doctor.info.lastName}}</ion-option>
+				    </ion-select>
+				</ion-item>
+<!-- 				<div class="form-group">
+					<select class="form-control" [(ngModel)]="selectedState" (change)='setHospitalList()'>
+						<option disabled value="initial">Select state</option>
+						<option *ngFor="let state of stateList" >{{state.name}}</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<select class="form-control" [(ngModel)]="selectedHospital" (change)='setDoctorList()'>
+						<option disabled value="initial">Select hospital/dispensary/clinic</option>
+						<optgroup label="Hospitals" *ngIf="hospitalList && hospitalList.hospitals.length>0">
+						<option *ngFor="let hospital of hospitalList.hospitals">{{hospital.hospital_name}}</option>
+						<optgroup label="Dispensaries" *ngIf="hospitalList && hospitalList.dispensaries.length>0">
+						<option *ngFor="let hospital of hospitalList.dispensaries">{{hospital.hospitalname}}</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<select class="form-control" [disabled]="true">
+						<option disabled>Select department</option>
+						<option *ngFor="let dep of departmentList">{{dep}}</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<select class="form-control" [(ngModel)]="selectedDoctor">
+						<option disabled value="initial">Select doctor</option>
+						<option *ngFor="let doctor of doctorList" [value]="doctor.uid">{{doctor.info.firstName}} {{doctor.info.lastName}}</option>
+					</select>
+				</div> -->
+
+				<ion-item>
+				  <ion-label>Date</ion-label>
+				  <ion-datetime displayFormat="DD/MM/YY" pickerFormat="MMM DD, YYYY" [(ngModel)]="appointmentDate"></ion-datetime>
+				</ion-item>
+
+				<ion-item>
+				  <ion-label>Time</ion-label>
+				  <ion-datetime displayFormat="h:mm A" pickerFormat="h mm A" [(ngModel)]="appointmentTime"></ion-datetime>
+				</ion-item>
+
+			</ion-list>
+
+			<button ion-button (click)="createAppointment()" full>Create</button>
+		</div>
+
+		<div *ngSwitchCase="'upcoming'">
+			<ion-list >
+
+	  		</ion-list>
+		</div>
+	  
+	  </div>
+	</div>
 </ion-content>

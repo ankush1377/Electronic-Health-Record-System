@@ -46,26 +46,26 @@ ion-list .item-divider{
 
 .registerForm{
     margin-top: 1%;
-    margin-left: 34%;
-    margin-right: 34%;
-    width: 32%;
+    margin-left: 14%;
+    margin-right: 14%;
+    width: 72%;
     float: left;
     padding: 25px 100px 25px 100px;
+    min-height: 55%;
 }
 
 .list ion-list-header{
     border-top: none;
-    border-bottom: 1px solid darkgrey;
-    font-size: 18px;
-    position: sticky;
+    border-bottom: 2px solid darkgrey;
     top: 0;
-    font-weight: bold;
-        font-size: 22px;
+    text-align: center;
+    font-size: 22.5px;
     font-family: "Segoe UI",Arial,sans-serif;
-        font-weight: 600;
+    font-weight: 600;
     float: left;
     color: white;
     background: none;
+    padding-left: 0px;
 }
 
 .background{
@@ -80,13 +80,42 @@ ion-list .item-divider{
 }
 
 .form-group input{
-    height: 40px;
-    font-size: 13px;
+    height: 42px;
+    font-size: 13.5px;
+    margin-bottom: 7%;
 }
 
 .form-group select{
-    height: 40px !important;
-    font-size: 13px;
+    height: 42px !important;
+    font-size: 13.5px;
+    margin-bottom: 7%;
+}
+
+.left{
+    width: 33%;
+    float: left;
+    padding-right: 1.5%;
+    height: 100%;
+}
+
+.centre{
+    width: 34%;
+    float: left;
+    padding: 0% 1.5%;
+    height: 100%;
+}
+
+.right{
+    width: 33%;
+    float: right;
+    padding-left: 1.5%;
+    height: 100%;
+}
+
+.registerButtonDiv{
+    width: 24%; 
+    margin-left: 38%; 
+    padding: 0% 2%;
 }
 
 }

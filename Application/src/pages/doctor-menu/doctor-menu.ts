@@ -37,17 +37,18 @@ export class DoctorMenuPage {
   uploadEvent: any = null;
   database: any;
   today: number = Date.now();
-  order: string = 'timestamp';
-  reverse: boolean = true;
+  visitsOrder: string = 'timestamp';
+  visitsReverse: boolean = true;
   recordsFilter: any = {startDate:'', endDate:''};
   uploadsChecked: boolean = true;
+  appointmentsOrder: string = 'appointment.data.timestamp';
 
   doctorInfo: any = {};
   patientInfo: any = {};
   recordsData: any = [];
   visitsData: any = [];  
   visitsDataFiltered: any = [];  
-  appointmentsData: any = [];
+  appointmentsData: any = {pending:[], upcoming:[], completed:[]};
   visitFilesUploaded: any = {records : [], prescriptions : []};
   
 
@@ -60,7 +61,7 @@ export class DoctorMenuPage {
     this.storageRef = firebase.storage().ref('/' + constants.STORAGE_DATA);
 
     this.fetchVisitsSummary();
-//    this.fetchAppointmentsData();
+    this.fetchAppointmentsData();
 
   }
 
@@ -250,51 +251,70 @@ export class DoctorMenuPage {
 
   }
 
-  // fetchAppointmentsData(){
-  //   console.log('fetchAppointmentsData');
 
-  //   var thisRef = this; 
-  //   let appointmentsPromise = new Promise((resolve, reject) => {
-  //     var appointmentsRef = thisRef.database.ref(constants.DB_APPOINTMENTS + '/' + thisRef.doctorInfo.uid);
-  //     appointmentsRef.on('value', (snapshot)=>{
-  //       resolve(snapshot.val());
-  //     });
-  //   });
 
-  //   appointmentsPromise.then( (appointmentsData)=>{
+  fetchAppointmentsData(){
+    console.log('fetchAppointmentsData');
+
+    this.appointmentsData = {pending:[], upcoming:[], completed:[]};
+    var thisRef = this; 
+    
+    let appointmentsPromise = new Promise((resolve, reject) => {
+      var appointmentsRef = thisRef.database.ref(constants.DB_APPOINTMENTS + '/' + thisRef.doctorInfo.uid);
+      appointmentsRef.on('value', (snapshot)=>{
+        resolve(snapshot.val());
+      });
+    });
+
+    appointmentsPromise.then( (appointmentsData)=>{
       
-  //     if(appointmentsData){
-  //       var patientUIDList = Object.keys(appointmentsData);
-  //       patientUIDList.forEach(function(patientUID){
-          
-  //         var patientName;
-  //         var reference = thisRef.database.ref(constants.DB_CREDENTIALS+'/'+constants.DB_CREDENTIALS_PATIENTS+'/'+patientUID);
-  //         reference.on("value", (snapshot)=> {
-  //           if(snapshot.val()){
-  //             var key = Object.keys(snapshot.val());
-  //             patientName = (snapshot.val())[key[0]].firstName + ' ' + (snapshot.val())[key[0]].lastName;
+      if(appointmentsData){
+        var keys = Object.keys(appointmentsData);
+        keys.forEach(function(key){
 
-  //             var keys = Object.keys(visitsData[patientUID]);
-  //             keys.forEach(function(key){
-                
-  //               thisRef.visitsData.push({
-  //                 patientUID: patientUID,
-  //                 patientName: patientName,
-  //                 timestamp: visitsData[patientUID][key].timestamp,
-  //                 hospitalName: visitsData[patientUID][key].hospitalName
-  //               });
+          var patientName;
+          var reference = thisRef.database.ref(constants.DB_CREDENTIALS+'/'+constants.DB_CREDENTIALS_PATIENTS+'/'+appointmentsData[key]['patientUID']);
+          reference.once("value", (snapshot)=> {
+            if(snapshot.val()){
+              var k = Object.keys(snapshot.val());
+              patientName = (snapshot.val())[k[0]].firstName + ' ' + (snapshot.val())[k[0]].lastName;
 
-  //             });
-  //           }
-  //         });
+              if(appointmentsData[key]['status']!==constants.APPOINTMENT_STATUS_REJECTED && new Date(appointmentsData[key]['timestamp'])<new Date()){
+                 var update = {};
+                 update[constants.DB_APPOINTMENTS + '/' + thisRef.doctorInfo.uid + '/' + key + '/status'] = constants.APPOINTMENT_STATUS_REJECTED;
+                 thisRef.database.ref().update(update);
+              }
 
-  //         // console.log(thisRef.orderPipe);
-  //         // thisRef.visitsData = thisRef.orderPipe.transform(thisRef.visitsData, 'timestamp');
-  //         // console.log(thisRef.visitsData);
-  //       });
-  //     }
-  //   });
-  // }
+              if(appointmentsData[key]['status']===constants.APPOINTMENT_STATUS_PENDING){
+                thisRef.appointmentsData.pending.push({
+                  key: key,
+                  data: appointmentsData[key],
+                  patientName: patientName
+                });
+              }
+              else if(appointmentsData[key]['status']===constants.APPOINTMENT_STATUS_APPROVED){
+                thisRef.appointmentsData.upcoming.push({
+                  key: key,
+                  data: appointmentsData[key],
+                  patientName: patientName
+                });
+              }
+              else if(appointmentsData[key]['status']===constants.APPOINTMENT_STATUS_REJECTED){
+                thisRef.appointmentsData.completed.push({
+                  key: key,
+                  data: appointmentsData[key],
+                  patientName: patientName
+                });
+              }
+            }
+          });
+
+        });
+      }
+    }).catch((error)=>{
+            console.log(error);
+          });
+  }
 
 
 
@@ -499,6 +519,58 @@ export class DoctorMenuPage {
   addPrescription(){
    this.selectedSegment = 'patientCentre'; 
    this.pcSelection = 'prescription';
+  }
+
+  approveAppointment(appointment){
+    let confirm = this.alertCtrl.create({
+      title: 'Appointment Approval',
+      message: 'Are you sure you want to approve this appointment?',
+      buttons: [
+      {
+        text: 'No',
+        handler: () => {
+          console.log('Cancel clicked');
+        }
+      },
+      {
+       text: 'Yes',
+       handler: () => {
+         console.log('Appointment approved');
+         var update = {};
+         update[constants.DB_APPOINTMENTS + '/' + this.doctorInfo.uid + '/' + appointment.key + '/status'] = constants.APPOINTMENT_STATUS_APPROVED;
+         this.database.ref().update(update);
+         this.fetchAppointmentsData();
+       }
+     }
+     ]
+   });
+    confirm.present();
+  }
+
+  refuseAppointment(appointment){
+    let confirm = this.alertCtrl.create({
+      title: 'Appointment Approval',
+      message: 'Are you sure you want to reject this appointment?',
+      buttons: [
+      {
+        text: 'No',
+        handler: () => {
+          console.log('Cancel clicked');
+        }
+      },
+      {
+       text: 'Yes',
+       handler: () => {
+         console.log('Appointment rejected');
+         var update = {};
+         update[constants.DB_APPOINTMENTS + '/' + this.doctorInfo.uid + '/' + appointment.key + '/status'] = constants.APPOINTMENT_STATUS_REJECTED;
+         this.database.ref().update(update);
+         this.fetchAppointmentsData();
+       }
+     }
+     ]
+   });
+    confirm.present();
   }
 
 

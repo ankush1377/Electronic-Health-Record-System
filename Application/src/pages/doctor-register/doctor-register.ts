@@ -24,7 +24,7 @@ import * as constants from '../../constants';
 })
 export class DoctorRegisterPage {
 
-  doctorInfo: any = {};
+  doctorInfo: any = {department:'initial'};
 	password: string = "";
 	cPassword: string = "";
   hospitalList: any = [];
@@ -75,13 +75,43 @@ export class DoctorRegisterPage {
       return;
     }
 
+    if(this.doctorInfo.firstName == ""){
+      this.utilityProvider.showAlert('Error', 'Please enter first name');
+      return;
+    }
+
+    if(this.doctorInfo.lastName == ""){
+      this.utilityProvider.showAlert('Error', 'Please enter last name');
+      return;
+    }
+
+    if(this.doctorInfo.gender == ""){
+      this.utilityProvider.showAlert('Error', 'Please enter last name');
+      return;
+    }
+
+    if(this.doctorInfo.dateOfBirth == ""){
+      this.utilityProvider.showAlert('Error', 'Please enter last name');
+      return;
+    }
+
+    if(this.selectedState == ""){
+      this.utilityProvider.showAlert('Error', 'Please enter last name');
+      return;
+    }
+
+    if(this.selectedHospital == ""){
+      this.utilityProvider.showAlert('Error', 'Please enter last name');
+      return;
+    }
+
     if(this.password == this.cPassword){
-      if(this.validateUPRN(this.doctorInfo.uprn)){
+      // if(this.validateUPRN(this.doctorInfo.uprn)){
         this.afAuth.auth.createUserWithEmailAndPassword(this.doctorInfo.emailId, this.password)
         .then(data=>{
           console.log('Registered with email ' + this.doctorInfo.emailId);
-            this.storage.set('emailId', this.doctorInfo.emailId);
-            this.storage.set('password', this.password);
+            this.doctorInfo.state = this.selectedState;
+            this.doctorInfo.hospitalName = this.selectedHospital;
             this.db.list(constants.DB_CREDENTIALS + '/' + constants.DB_CREDENTIALS_DOCTORS + '/' + data.uid).push(this.doctorInfo);
             this.doctorInfo['uid'] = data.uid;
             this.navCtrl.setRoot(DoctorMenuPage, this.doctorInfo);
@@ -90,16 +120,16 @@ export class DoctorRegisterPage {
           console.log('Registration error : ', error.message);
           this.utilityProvider.showAlert('Error', error.message);
         })
-      }
+      // }
   	}
   	else{
 		  this.utilityProvider.showAlert('Error', 'Both passwords do not match!');
   	}
   }
 
-  validateUPRN(uprn: string){
-    return true;
-  }
+  // validateUPRN(uprn: string){
+  //   return true;
+  // }
 
 
   ionViewDidLoad() {

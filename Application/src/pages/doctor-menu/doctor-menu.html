@@ -68,7 +68,7 @@
                   <ion-list-header>
                     <div class="headerText">My profile</div>
                     <ion-buttons end>
-                        <button id="" ion-button icon-right>
+                        <button id="" ion-button icon-right [disabled]="true">
                           Edit
                           <ion-icon ios="ios-create" md="md-create"></ion-icon>
                         </button>
@@ -101,7 +101,7 @@
                       <p>Gender</p>
                     </div>
                     <div id="right">
-                      <h2>{{doctorInfo.dateOfBirth}}</h2>
+                      <h2>{{doctorInfo.dateOfBirth | date}}</h2>
                       <p>Date of Birth</p>
                     </div>
                   </ion-item>
@@ -181,7 +181,7 @@
                           <p>Gender</p>
                         </div>
                         <div id="right">
-                          <h2>{{patientInfo.dateOfBirth}}</h2>
+                          <h2>{{patientInfo.dateOfBirth | date}}</h2>
                           <p>Date of Birth</p>
                         </div>
                       </ion-item>
@@ -258,7 +258,7 @@
                     </ion-item>
                     <ion-item>
                       <div id="left">
-                        <h2>{{patientInfo.dateOfBirth}}</h2>
+                        <h2>{{patientInfo.dateOfBirth | date}}</h2>
                         <p>Patient DOB</p>
                       </div>
                       <div id="right">
@@ -335,7 +335,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let visitRecord of visitsDataFiltered | orderBy: order: reverse | filter: searchKey ">
+                <tr *ngFor="let visitRecord of visitsDataFiltered | orderBy: visitsOrder: visitsReverse | filter: searchKey ">
                   <td>{{visitRecord.visitNumber}}</td>
                   <td>{{visitRecord.patientUID}}</td>
                   <td>{{visitRecord.patientName}}</td>
@@ -378,15 +378,104 @@
             </div>
 
             <div [ngSwitch]="appointmentsSelection">
-              
+
               <div *ngSwitchCase="'pending'">
-                
+                <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>SNo</th>
+                      <th>Patient UID</th>
+                      <th>Patient Name</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Approve</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let appointment of appointmentsData.pending | orderBy: visitsOrder; let i=index">
+                      <td>{{i+1}}</td>
+                      <td>{{appointment.data.patientUID}}</td>
+                      <td>{{appointment.patientName}}</td>
+                      <td>{{appointment.data.timestamp | date}}</td>
+                      <td>{{appointment.data.timestamp | date:'shortTime'}}</td>
+                      <td>
+                        <button ion-button icon-only clear id="tableButton"  (click)="approveAppointment(appointment)">
+                          <ion-icon ios="ios-thumbs-up" md="md-thumbs-up"></ion-icon>
+                        </button>
+                        <button ion-button icon-only clear id="tableButton"  (click)="refuseAppointment(appointment)">
+                          <ion-icon ios="ios-thumbs-down" md="md-thumbs-down"></ion-icon>
+                        </button>                        
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="jumbotron" *ngIf="appointmentsData.pending.length==0" style="background: #fff; margin-top: -10px; 
+            text-align: center;">
+              <h6>No pending requests!</h6>
+            </div>
               </div>
 
               <div *ngSwitchCase="'upcoming'">
+                <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>SNo</th>
+                      <th>Patient UID</th>
+                      <th>Patient Name</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let appointment of appointmentsData.upcoming | orderBy: visitsOrder; let i=index">
+                      <td>{{i+1}}</td>
+                      <td>{{appointment.data.patientUID}}</td>
+                      <td>{{appointment.patientName}}</td>
+                      <td>{{appointment.data.timestamp | date}}</td>
+                      <td>{{appointment.data.timestamp | date:'shortTime'}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="jumbotron" *ngIf="appointmentsData.upcoming.length==0" style="background: #fff; margin-top: -10px; 
+            text-align: center;">
+              <h6>No upcoming appointments!</h6>
+            </div>
               </div>
 
               <div *ngSwitchCase="'completed'">
+                <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>SNo</th>
+                      <th>Patient UID</th>
+                      <th>Patient Name</th>
+                      <th>Date</th>
+                      <th>Time</th>                      
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let appointment of appointmentsData.completed | orderBy: visitsOrder; let i=index">
+                      <td>{{i+1}}</td>
+                      <td>{{appointment.data.patientUID}}</td>
+                      <td>{{appointment.patientName}}</td>
+                      <td>{{appointment.data.timestamp | date}}</td>
+                      <td>{{appointment.data.timestamp | date:'shortTime'}}</td>
+                      <td>
+                        <button ion-button icon-only clear id="tableButton" [disabled]="true" *ngIf="appointment.data.status=='approved'">
+                          <ion-icon ios="ios-thumbs-up" md="md-thumbs-up"></ion-icon>
+                        </button>
+                        <button ion-button icon-only clear id="tableButton" [disabled]="true" *ngIf="appointment.data.status=='refuse'" >
+                          <ion-icon ios="ios-thumbs-down" md="md-thumbs-down"></ion-icon>
+                        </button>  
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="jumbotron" *ngIf="appointmentsData.completed.length==0" style="background: #fff; margin-top: -10px; 
+            text-align: center;">
+              <h6>No appointments completed yet!</h6>
+            </div>
               </div>
 
             </div>

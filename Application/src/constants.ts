@@ -17,3 +17,7 @@ export const STORAGE_DATA = 'data';
 export const NOTIFICATION_STATUS_PENDING = 'pending';
 export const NOTIFICATION_STATUS_APPROVED = 'approved';
 export const NOTIFICATION_STATUS_REJECTED = 'refuse';
+
+export const APPOINTMENT_STATUS_PENDING = 'pending';
+export const APPOINTMENT_STATUS_APPROVED = 'approved';
+export const APPOINTMENT_STATUS_REJECTED = 'refuse';

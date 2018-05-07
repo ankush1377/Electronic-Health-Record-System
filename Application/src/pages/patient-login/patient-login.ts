@@ -22,8 +22,8 @@ import * as constants from '../../constants';
 })
 export class PatientLoginPage {
 
-  emailId: string = 'p@gmail.com';
-  password: string = 'aaaaaa';
+  emailId: string = '';
+  password: string = '';
   database: any;
 
   constructor(public alertCtrl: AlertController, public utilityProvider: UtilityProvider, 
