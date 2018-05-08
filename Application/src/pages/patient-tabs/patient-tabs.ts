@@ -6,6 +6,7 @@ import { PatientProfileTabPage } from '../patient-profile-tab/patient-profile-ta
 import { PatientRecordTabPage } from '../patient-record-tab/patient-record-tab';
 import { PatientDiseasePredictorTabPage } from '../patient-disease-predictor-tab/patient-disease-predictor-tab';
 import { PatientAppointmentsTabPage } from '../patient-appointments-tab/patient-appointments-tab';
+import { PatientPrescriptionsTabPage } from '../patient-prescriptions-tab/patient-prescriptions-tab';
 
 /**
  * Generated class for the PatientTabsPage page.
@@ -20,10 +21,11 @@ import { PatientAppointmentsTabPage } from '../patient-appointments-tab/patient-
 export class PatientTabsPage {
 
   userData: Object;
-  tab1Root = PatientRecordTabPage;
-  tab2Root = PatientProfileTabPage;
-  tab3Root = PatientDiseasePredictorTabPage;
-  tab4Root = PatientAppointmentsTabPage;
+  tab1Root = PatientPrescriptionsTabPage;
+  tab2Root = PatientRecordTabPage;
+  tab3Root = PatientProfileTabPage;
+  tab4Root = PatientDiseasePredictorTabPage;
+  tab5Root = PatientAppointmentsTabPage;
 
   constructor(public navParams: NavParams) {
   	this.userData = navParams.data;

@@ -132,7 +132,7 @@
                 <ion-segment-button value="report" [disabled]="!recordsAccessApproval">
                   New Report
                 </ion-segment-button>
-                <ion-segment-button value="prescription" [disabled]="true">
+                <ion-segment-button value="prescription" [disabled]="!recordsAccessApproval">
                   New Prescription
                 </ion-segment-button>
               </ion-segment>
@@ -199,10 +199,10 @@
                             </button>
                         </ion-buttons>                   
                       </ion-list-header>
-                      <ion-item *ngIf="recordsData.length==0">
+                      <ion-item *ngIf="filesData.records.length==0">
                         No records to display!
                       </ion-item>
-                      <button ion-item *ngFor="let record of recordsData" (click)="fetchReport(record.url)">
+                      <button ion-item *ngFor="let record of filesData.records" (click)="fetchReport(record.url)">
                         <h2>{{record.fileName}}</h2>
                       </button>
                     </ion-list>
@@ -213,18 +213,18 @@
                       <ion-list-header>
                         <div class="headerText">Past prescriptions</div>
                         <ion-buttons end>
-                            <button id="" ion-button icon-right (click)="addPrescription()" [disabled]="true">
+                            <button id="" ion-button icon-right (click)="addPrescription()">
                               Prescribe
                               <ion-icon ios="ios-paper" md="md-paper"></ion-icon>
                             </button>
                         </ion-buttons>  
                       </ion-list-header>
-                      <ion-item *ngIf="true">
+                      <ion-item *ngIf="filesData.prescriptions.length==0">
                         No records to display!
                       </ion-item>
-    <!--                   <button ion-item *ngFor="let prescription of prescriptionData">
-                        <ion-label (click)="fetchReport(record.url)">{{record.name}}</ion-label>
-                      </button> -->
+                      <button ion-item *ngFor="let prescription of filesData.prescriptions" (click)="fetchReport(prescription.url)">
+                        <h2>{{prescription.fileName}}</h2>
+                      </button>
                     </ion-list>
                   </div>
                 </div> 
@@ -258,12 +258,12 @@
                     </ion-item>
                     <ion-item>
                       <div id="left">
-                        <h2>{{patientInfo.dateOfBirth | date}}</h2>
-                        <p>Patient DOB</p>
+                        <h2>{{patientAge}} yrs</h2>
+                        <p>Patient age</p>
                       </div>
                       <div id="right">
                         <h2>{{doctorInfo.hospitalName}}</h2>
-                        <p>Hospital/Clinic Name</p>
+                        <p>Hospital/Clinic name</p>
                       </div>
                     </ion-item>
                     <ion-item>
@@ -271,10 +271,10 @@
                     </ion-item>
                     <ion-item>
                     <div id="left">
-                      <input id="file-field" style="margin: 7px;" name="file-field" (change)="chooseFile($event)" type="file" accept=".pdf">
+                      <input id="file-field" style="margin: 7px;" name="file-field" (change)="chooseFile($event,'report')" type="file" accept=".pdf">
                     </div>
                     <div id="right">
-                      <button ion-button id="uploadButton" (click)="uploadFile(patientUid)">Upload</button>
+                      <button ion-button id="uploadButton" (click)="uploadReport(patientUid)">Upload</button>
                     </div>
                     </ion-item>
                   </ion-list>
@@ -282,7 +282,63 @@
               </ion-list>
               
               <ion-list *ngSwitchCase="'prescription'">
-
+                <div class="newReportBox">
+                  <ion-list>
+                    <ion-list-header>
+                      <div class="headerText">Add new prescription</div>
+                    </ion-list-header>
+                    <ion-item>
+                      <div id="left">
+                        <h2>{{patientUid}}</h2>
+                        <p>Patient UID</p>
+                      </div>
+                      <div id="right">
+                        <h2>{{today | date}}</h2>
+                        <p>Date</p>
+                      </div>
+                    </ion-item>
+                    <ion-item>
+                      <div id="left">
+                        <h2>{{patientInfo.firstName}} {{patientInfo.lastName}}</h2>
+                        <p>Patient name</p>
+                      </div>
+                      <div id="right">
+                        <h2>{{doctorInfo.firstName}} {{doctorInfo.lastName}}</h2>
+                        <p>Doctor name</p>
+                      </div>
+                    </ion-item>
+                    <ion-item>
+                      <div id="left">
+                        <h2>{{patientAge}} yrs</h2>
+                        <p>Patient age</p>
+                      </div>
+                      <div id="right">
+                        <h2>{{doctorInfo.hospitalName}}</h2>
+                        <p>Hospital/Clinic name</p>
+                      </div>
+                    </ion-item>
+                    <ion-item>
+                      Prescription type: 
+                      <label class="radio-inline"><input type="radio" name="prescriptionType" [(ngModel)]="prescriptionType" value="file" selected="true">File</label>
+                      <label class="radio-inline"><input type="radio" name="prescriptionType" [(ngModel)]="prescriptionType" value="text">Text</label>                      
+                    </ion-item>
+                    <ion-item>
+                    <div id="left" >
+                      <input id="file-field" style="" name="file-field" (change)="chooseFile($event,'prescription')" type="file" accept=".pdf" [disabled]="prescriptionType=='text'">
+                      <button ion-button id="uploadButton" (click)="uploadPrescription(patientUid)">Upload</button>
+                    </div>
+                    <div id="right">
+                      <div class="form-group">
+                        <label for="comment">Prescription:</label>
+                        <textarea class="form-control" rows="5" id="comment" [disabled]="prescriptionType=='file'"></textarea>
+                      </div>
+                    </div>
+                    </ion-item>
+                    <ion-item>
+                      
+                    </ion-item>
+                  </ion-list>
+                </div>
               </ion-list>
             </div>
 
@@ -345,7 +401,7 @@
                     <button ion-button icon-only clear id="tableButton" [disabled]="noRecordsUploaded(visitRecord)" (click)="openRecordsList(visitRecord)">
                       <ion-icon ios="ios-document" md="md-document"></ion-icon>
                     </button>
-                    <button ion-button icon-only clear id="tableButton" [disabled]="true">
+                    <button ion-button icon-only clear id="tableButton" [disabled]="noPrescriptionsUploaded(visitRecord)" (click)="openPrescriptionsList(visitRecord)">
                       <ion-icon ios="ios-paper" md="md-paper"></ion-icon>
                     </button>
                   </td>

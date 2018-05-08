@@ -38,9 +38,11 @@ export class PatientAppointmentsTabPage {
   selectedState = 'initial';
   selectedHospital = 'initial';
   selectedDoctor = 'initial';
-  selectedSegment: string = 'new'; 
+  selectedSegment: string = 'upcoming'; 
   appointmentDate: Date;
   appointmentTime: Date;
+  appointmentsOrder: string = 'data.timestamp';
+  appointmentsReverse: boolean = false;
 
   constructor(private afAuth: AngularFireAuth, private notificationsProvider: NotificationsProvider, public alertCtrl: AlertController,
     private utilityProvider: UtilityProvider, public appCtrl: App, public navCtrl: NavController, private db: AngularFireDatabase,
@@ -58,6 +60,8 @@ export class PatientAppointmentsTabPage {
     notificationsRef.on('value', (snapshot)=>{
       notificationsProvider.pollNotifications(this.database, this.notificationsData);      
     });
+
+    this.fetchPatientAppointments();
 
   }
 
@@ -155,6 +159,59 @@ export class PatientAppointmentsTabPage {
     confirm.present();
 
   }
+
+
+  fetchPatientAppointments(){
+    console.log('fetchPatientAppointments');
+
+    this.appointmentsData = [];
+    var thisRef = this; 
+    
+    let appointmentsPromise = new Promise((resolve, reject) => {
+      var appointmentsRef = thisRef.database.ref(constants.DB_APPOINTMENTS);
+      appointmentsRef.on('value', (snapshot)=>{
+        resolve(snapshot.val());
+      });
+    });
+
+    appointmentsPromise.then( (appointmentsData)=>{
+      
+      if(appointmentsData){
+        var doctorUidList = Object.keys(appointmentsData);
+        doctorUidList.forEach(function(doctorUid){
+
+          var keys = Object.keys(appointmentsData[doctorUid]);
+          keys.forEach(function(key){
+            
+            if(appointmentsData[doctorUid][key].patientUID===thisRef.userData.uid){
+
+              var doctorName;
+              var reference = thisRef.database.ref(constants.DB_CREDENTIALS+'/'+constants.DB_CREDENTIALS_DOCTORS+'/'+doctorUid);
+              reference.once("value", (snapshot)=> {
+                if(snapshot.val()){
+                  
+                  var k = Object.keys(snapshot.val());
+                  doctorName = (snapshot.val())[k[0]].firstName + ' ' + (snapshot.val())[k[0]].lastName;
+                  
+                  thisRef.appointmentsData.push({
+                    // key: key,
+                    doctorUid: doctorUid,
+                    data: appointmentsData[doctorUid][key],
+                    doctorName: doctorName
+                  });
+                }
+              });
+            }
+          });
+        });
+      }
+    }).catch((error)=>{
+      console.log(error);
+    });
+
+    console.log(thisRef.appointmentsData);
+  }
+
 
   presentNotifications(event){
     this.notificationsProvider.presentNotifications(event, this.popoverCtrl, this.notificationsData);

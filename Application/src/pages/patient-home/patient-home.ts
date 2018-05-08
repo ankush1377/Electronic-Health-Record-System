@@ -18,7 +18,6 @@ import { PatientRegisterPage } from '../patient-register/patient-register';
 export class PatientHomePage {
 
   constructor( public navCtrl: NavController ) {
-    this.signIn();
   }
 
   signIn(){

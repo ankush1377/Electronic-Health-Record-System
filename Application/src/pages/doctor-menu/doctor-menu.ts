@@ -33,8 +33,10 @@ export class DoctorMenuPage {
   patientUid: string = "";
   storageRef: any;
   recordsAccessApproval: boolean = false;
-  fileSelected: any = null;
-  uploadEvent: any = null;
+  reportFileSelected: any = null;
+  prescriptionFileSelected: any = null;
+  reportUploadEvent: any = null;
+  prescriptionUploadEvent: any = null;
   database: any;
   today: number = Date.now();
   visitsOrder: string = 'timestamp';
@@ -43,10 +45,12 @@ export class DoctorMenuPage {
   uploadsChecked: boolean = true;
   appointmentsOrder: string = 'data.timestamp';
   appointmentsReverse: boolean = false;
+  patientAge: number;
+  prescriptionType: string = 'file';
 
   doctorInfo: any = {};
   patientInfo: any = {};
-  recordsData: any = [];
+  filesData: any = {records:[], prescriptions:[]};
   visitsData: any = [];  
   visitsDataFiltered: any = [];  
   appointmentsData: any = {pending:[], upcoming:[], completed:[]};
@@ -123,7 +127,8 @@ export class DoctorMenuPage {
                       handler: () => {
                         console.log('Fetch patient records');
                         this.selectedSegment = 'patientCentre';
-                        this.fetchPatientRecords(this.patientUid);
+                        this.fetchPatientFiles(this.patientUid);
+                        this.patientAge = this.utilityProvider.calculateAge(new Date(this.patientInfo.dateOfBirth));
                         this.recordsAccessApproval = true;
                       }
                     }
@@ -173,7 +178,7 @@ export class DoctorMenuPage {
 
 
   fetchVisitsSummary(){
-    console.log('fetchRecordsSummary');
+    console.log('fetchVisitsSummary');
 
     var thisRef = this; 
     let visitsPromise = new Promise((resolve, reject) => {
@@ -221,7 +226,7 @@ export class DoctorMenuPage {
         });
       }
       thisRef.visitsDataFiltered = thisRef.visitsData;
-//      console.log(thisRef.visitsDataFiltered);
+      console.log(thisRef.visitsDataFiltered);
     });
   }
 
@@ -319,30 +324,43 @@ export class DoctorMenuPage {
 
 
 
-  fetchPatientRecords(uid){
-    console.log('fetchPatientRecords');
+  fetchPatientFiles(uid){
+    console.log('fetchPatientFiles');
 
     var thisRef = this; 
-    let recordsPromise = new Promise((resolve, reject) => {
-      var notificationsRef = thisRef.database.ref(constants.DB_RECORDS + '/' + uid);
+    let filesPromise = new Promise((resolve, reject) => {
+      var notificationsRef = thisRef.database.ref(constants.DB_FILES + '/' + uid);
       notificationsRef.on('value', (snapshot)=>{
         resolve(snapshot.val());
       });
     });
 
-    recordsPromise.then( (records)=>{
-      thisRef.recordsData = [];
-      console.log(records);
-      if(records){
-        var keys = Object.keys(records);
-        keys.forEach(function(key){
-          thisRef.storageRef.child(uid + '/' + records[key].fileName).getDownloadURL().then(function(url) {
-            thisRef.recordsData.push({
-              fileName: records[key].fileName,
-              url: url
+    filesPromise.then( (files)=>{
+      thisRef.filesData = {records:[], prescriptions:[]};
+      console.log(files);
+      if(files){
+
+        if(files['records']){
+          var keys = Object.keys(files["records"]);
+          keys.forEach(function(key){
+            thisRef.filesData.records.push({
+              fileName: files['records'][key].fileName,
+              url: files['records'][key].url
             });
-          })
-        })
+          });         
+        }
+
+
+        if(files['prescriptions']){
+          keys = Object.keys(files["prescriptions"]);
+          keys.forEach(function(key){
+            thisRef.filesData.prescriptions.push({
+              fileName: files['prescriptions'][key].fileName,
+              url: files['prescriptions'][key].url
+            });
+          });
+        }
+
       }
     });
   }
@@ -355,17 +373,24 @@ export class DoctorMenuPage {
 
 
 
-  chooseFile(event){
-    this.fileSelected = event.target.files[0];
-    this.uploadEvent = event;
+  chooseFile(event, section: string){
+    if(section==='report'){
+      this.reportFileSelected = event.target.files[0];
+      this.reportUploadEvent = event;
+    }
+    else if(section==='prescription'){
+      this.prescriptionFileSelected = event.target.files[0];
+      this.prescriptionUploadEvent = event;
+    }
+    
   }
 
 
 
-  uploadFile(patientUid){
+  uploadReport(patientUid){
     var thisRef = this;
 
-    if(!thisRef.fileSelected){
+    if(!thisRef.reportFileSelected){
       this.utilityProvider.showAlert('Error', 'Please select a file');
       return;
     }
@@ -387,9 +412,8 @@ export class DoctorMenuPage {
       }
     });
 
-    if(thisRef.fileSelected && patientUid){
-      console.log(thisRef.fileSelected);
-      var uploadTask = this.storageRef.child(patientUid + '/' + thisRef.fileSelected.name).put(thisRef.fileSelected);
+    if(thisRef.reportFileSelected && patientUid){
+      var uploadTask = this.storageRef.child(patientUid + '/records/' + thisRef.reportFileSelected.name).put(thisRef.reportFileSelected);
       uploadTask.on('state_changed', function(snapshot){
         // Observe state change events such as progress, pause, and resume
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -411,18 +435,82 @@ export class DoctorMenuPage {
         var downloadURL = uploadTask.snapshot.downloadURL;
     //    console.log(downloadURL);
         thisRef.visitFilesUploaded.records.push({
-          fileName: thisRef.fileSelected.name,
+          fileName: thisRef.reportFileSelected.name,
           url: downloadURL
         });
-        thisRef.db.list(constants.DB_RECORDS + '/' + patientUid).push({
-          fileName: thisRef.fileSelected.name,
+        thisRef.db.list(constants.DB_FILES + '/' + patientUid + '/' + constants.DB_FILES_RECORDS).push({
+          fileName: thisRef.reportFileSelected.name,
           url: downloadURL
         });
         if(thisRef.recordsAccessApproval)
-          thisRef.fetchPatientRecords(patientUid);
+          thisRef.fetchPatientFiles(patientUid);
       });
     }
   }
+
+
+  uploadPrescription(patientUid){
+    var thisRef = this;
+
+    if(!thisRef.prescriptionFileSelected){
+      this.utilityProvider.showAlert('Error', 'Please select a file');
+      return;
+    }
+
+    let uidCheckPromise = new Promise((resolve, reject) => {
+      var database = firebase.database();
+      var notificationsRef = database.ref(constants.DB_CREDENTIALS + '/' + constants.DB_CREDENTIALS_PATIENTS + '/' + patientUid);
+      notificationsRef.on('value', (snapshot)=>{
+        resolve(snapshot.val());
+      });
+    });
+
+    uidCheckPromise.then( (data)=>{
+      if(!data || !patientUid){
+        this.utilityProvider.showAlert('Error', 'Enter a valid patient UID');
+        // this.fileSelected = null;
+        // this.uploadEvent.target.files = null;
+        return;
+      }
+    });
+
+    if(thisRef.prescriptionFileSelected && patientUid){
+      console.log(thisRef.prescriptionFileSelected);
+      var uploadTask = this.storageRef.child(patientUid + '/prescriptions/' + thisRef.prescriptionFileSelected.name).put(thisRef.prescriptionFileSelected);
+      uploadTask.on('state_changed', function(snapshot){
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+        }
+      }, function(error) {
+        // Handle unsuccessful uploads
+      }, function() {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        var downloadURL = uploadTask.snapshot.downloadURL;
+    //    console.log(downloadURL);
+        thisRef.visitFilesUploaded.prescriptions.push({
+          fileName: thisRef.prescriptionFileSelected.name,
+          url: downloadURL
+        });
+        thisRef.db.list(constants.DB_FILES + '/' + patientUid + '/' + constants.DB_FILES_PRESCRIPTIONS).push({
+          fileName: thisRef.prescriptionFileSelected.name,
+          url: downloadURL
+        });
+        if(thisRef.recordsAccessApproval)
+          thisRef.fetchPatientFiles(patientUid);
+      });
+    }
+  }
+
 
 
 
@@ -479,7 +567,7 @@ export class DoctorMenuPage {
 
           this.recordsAccessApproval = false;
           this.patientUid = "";
-          this.recordsData = [];
+          this.filesData = [];
           this.patientInfo = {};
           this.selectedSegment = 'patientCentre';
           this.pcSelection = 'validation';
@@ -497,7 +585,25 @@ export class DoctorMenuPage {
     if(!visitRecord.filesUploaded)
       return true;
 
-    if(visitRecord.filesUploaded.records.length==0)
+    if(!visitRecord.filesUploaded.records)
+      return true;
+
+    if(visitRecord.filesUploaded.records && visitRecord.filesUploaded.records.length==0)
+      return true;
+
+    return false;
+  }
+
+
+  noPrescriptionsUploaded(visitRecord){
+
+    if(!visitRecord.filesUploaded)
+      return true;
+
+    if(!visitRecord.filesUploaded.prescriptions)
+      return true;
+
+    if(visitRecord.filesUploaded.prescriptions && visitRecord.filesUploaded.prescriptions.length==0)
       return true;
 
     return false;
@@ -505,9 +611,18 @@ export class DoctorMenuPage {
 
 
 
+
   openRecordsList(visitRecord){
     console.log(visitRecord);
-    let modal = this.modalCtrl.create(UploadedRecordsModalComponent, visitRecord);
+    let modal = this.modalCtrl.create(UploadedRecordsModalComponent, visitRecord.filesUploaded.records);
+    modal.present();
+  }
+
+
+
+  openPrescriptionsList(visitRecord){
+    console.log(visitRecord);
+    let modal = this.modalCtrl.create(UploadedRecordsModalComponent, visitRecord.filesUploaded.prescriptions);
     modal.present();
   }
 

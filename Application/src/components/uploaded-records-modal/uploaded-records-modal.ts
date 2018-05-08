@@ -17,7 +17,7 @@ export class UploadedRecordsModalComponent {
 
   constructor(private params: NavParams, private iab: InAppBrowser) {
     console.log('Hello UploadedRecordsModalComponent Component');
-    this.recordsData = params.data.filesUploaded.records;
+    this.recordsData = params.data;
   }
 
   fetchReport(recordUrl){

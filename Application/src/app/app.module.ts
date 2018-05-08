@@ -26,6 +26,7 @@ import { PatientProfileTabPage } from '../pages/patient-profile-tab/patient-prof
 import { PatientRecordTabPage } from '../pages/patient-record-tab/patient-record-tab';
 import { PatientAppointmentsTabPage } from '../pages/patient-appointments-tab/patient-appointments-tab';
 import { PatientDiseasePredictorTabPage } from '../pages/patient-disease-predictor-tab/patient-disease-predictor-tab';
+import { PatientPrescriptionsTabPage } from '../pages/patient-prescriptions-tab/patient-prescriptions-tab';
 import { DoctorHomePage } from '../pages/doctor-home/doctor-home';
 import { DoctorRegisterPage } from '../pages/doctor-register/doctor-register';
 import { DoctorMenuPage } from '../pages/doctor-menu/doctor-menu';
@@ -60,6 +61,7 @@ import { NotificationsProvider } from '../providers/notifications/notifications'
     PatientRecordTabPage,
     PatientDiseasePredictorTabPage,
     PatientAppointmentsTabPage,
+    PatientPrescriptionsTabPage,
     DoctorHomePage,
     DoctorRegisterPage,
     DoctorMenuPage,
@@ -96,6 +98,7 @@ import { NotificationsProvider } from '../providers/notifications/notifications'
     PatientRecordTabPage,
     PatientDiseasePredictorTabPage,
     PatientAppointmentsTabPage,
+    PatientPrescriptionsTabPage,
     DoctorHomePage,
     DoctorRegisterPage,
     DoctorMenuPage,

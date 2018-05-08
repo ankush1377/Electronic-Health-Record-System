@@ -31,7 +31,7 @@
 
 	<div [ngSwitch]="selectedSegment">
 	  
-	  <div padding>
+	  <div>
 	  	<div *ngSwitchCase="'new'">
 			<ion-list >
 				
@@ -110,7 +110,10 @@
 
 		<div *ngSwitchCase="'upcoming'">
 			<ion-list >
-
+				<ion-item *ngFor="let appointment of appointmentsData | orderBy: appointmentsOrder: appointmentsReverse">
+				    <h2>{{appointment.doctorName}}</h2>
+				    <p>{{appointment.data.timestamp | date}}, {{appointment.data.timestamp | date:'shortTime'}}</p>
+				</ion-item>
 	  		</ion-list>
 		</div>
 	  

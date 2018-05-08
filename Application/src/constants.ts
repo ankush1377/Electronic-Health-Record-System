@@ -6,7 +6,9 @@ export const DB_CREDENTIALS_PATIENTS = 'patients';
 
 export const DB_NOTIFICATIONS = 'notifications';
 
-export const DB_RECORDS = 'records';
+export const DB_FILES = 'files';
+export const DB_FILES_RECORDS = 'records';
+export const DB_FILES_PRESCRIPTIONS = 'prescriptions';
 
 export const DB_VISITS = 'visits';
 

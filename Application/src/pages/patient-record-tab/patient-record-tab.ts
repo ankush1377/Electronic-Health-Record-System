@@ -42,7 +42,7 @@ export class PatientRecordTabPage {
       notificationsProvider.pollNotifications(this.database, this.notificationsData);      
     });
     
-    var recordsRef = this.database.ref(constants.DB_RECORDS + '/' + this.navParams.get('uid'));
+    var recordsRef = this.database.ref(constants.DB_FILES + '/' + this.navParams.get('uid') + '/' + constants.DB_FILES_RECORDS);
     recordsRef.on('value', (snapshot)=>{
       this.fetchRecords();     
     });
@@ -54,7 +54,7 @@ export class PatientRecordTabPage {
     var thisRef = this; 
     
     let recordsPromise = new Promise((resolve, reject) => {
-      var notificationsRef = thisRef.database.ref(constants.DB_RECORDS + '/' + this.navParams.get('uid'));
+      var notificationsRef = thisRef.database.ref(constants.DB_FILES + '/' + this.navParams.get('uid') + '/' + constants.DB_FILES_RECORDS);
       notificationsRef.on('value', (snapshot)=>{
         resolve(snapshot.val());
       });
@@ -63,11 +63,12 @@ export class PatientRecordTabPage {
     recordsPromise.then( (records)=>{
       thisRef.recordsData = [];
       if(records){
+        console.log(records);
         var keys = Object.keys(records);
-        keys.forEach(function(key, index){
-          thisRef.storageRef.child(records[key]).getDownloadURL().then(function(url) {
+        keys.forEach(function(key){
+          thisRef.storageRef.child('records/' + records[key].fileName).getDownloadURL().then(function(url) {
             thisRef.recordsData.push({
-              name: records[key],
+              name: records[key].fileName,
               url: url
             });
           })
